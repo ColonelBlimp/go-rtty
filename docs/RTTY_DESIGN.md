@@ -4,7 +4,7 @@
 - Date: 2 November 2026.
 - Module: `github.com/ColonelBlimp/go-rtty`.
 - Public package: `github.com/ColonelBlimp/go-rtty/rtty`.
-- Recommended project license: `GPL-3.0-only`, matching `go-ft8`.
+- Project license: `GPL-3.0-only`, matching `go-ft8`.
 
 `go-rtty` will provide a stateful RTTY receiver, a text and framing codec,
 and a streaming AFSK transmitter for Go applications. Applications will supply
@@ -181,6 +181,13 @@ an option, initially disabled. When enabled, SPACE switches the interpretation
 to letters and marks the source `ShiftSourceUSOS`. CR and LF do not implicitly
 change state in this profile.
 
+This is a deliberate project default, not an assumption about another modem.
+The fldigi configuration source examined during design review sets both
+`UOSrx` and `UOStx` to true. Reference fixtures must explicitly set and record
+receive and transmit USOS independently, verify the settings in the pinned
+build, and exercise both receive policies. Never compare unspecified defaults.
+[Fldigi configuration source](https://github.com/w1hkj/fldigi/blob/master/src/include/configuration.h).
+
 A continuous carrier pause preserves shift state. After declared carrier loss,
 the next acquisition starts with assumed letters. An explicit stream reset
 does the same. Joining a transmission in progress may therefore produce
@@ -295,6 +302,11 @@ PCM and 1.5 stop bits. Constructors require explicit valid configuration;
 `Config{}` is invalid. Options are also explicit: a zero `DecoderOptions`
 disables USOS and squelch, while `DefaultDecoderOptions` enables squelch.
 No constructor silently repairs an unknown enum or unsupported configuration.
+All GoDoc, README, and integration examples must start with `DefaultConfig()`
+and `DefaultDecoderOptions()`. To disable squelch deliberately, modify the
+returned options with `opts.Squelch.Enabled = false`. Document zero options
+as an explicit ungated receive mode and test it separately from the recommended
+defaults; it is not shorthand for those defaults.
 
 Validate finite frequencies and thresholds, nonzero baud terms, the supported
 rate/shift/sample-rate combinations, and valid enums. Reduce rational baud
@@ -373,9 +385,11 @@ assumed, explicit, or USOS state. Failed frames do not update shift state.
 `InputStart` and `InputEnd` are the half-open input sample range consumed by
 this call. A new decoder begins at zero. Observation times are fractional
 positions in that original PCM timeline, corrected for known DSP delay.
-They denote the estimated start transition and end of the configured stop
-interval, not the time the application receives the report. Delayed
-observations may refer to samples consumed by an earlier call.
+They denote the estimated start transition and end of the accepted stop
+interval, not the time the application receives the report. The stop end is
+the nominal boundary, or a validated earlier next-start edge inside the
+specified tolerance. Delayed observations may refer to samples consumed by
+an earlier call.
 
 Diagnostics are per-call deltas, so they can be summed across chunks.
 AcceptedFrames includes every returned code. PrintableChars includes SPACE
@@ -463,7 +477,11 @@ output. Validation of the entire input precedes output commitment.
 
 `FrameCodes` rejects values above 31 and invalid stop selections. It adds
 framing to the supplied codes without inserting shifts, lead-in, or tail.
-Adjacent identical states may be coalesced while preserving total half-bits.
+The output is canonical and uncoalesced: exactly seven entries per code, in
+order, for start, data bits 0 through 4, and stop. Start and data entries have
+`HalfBits=2`; the stop entry has `HalfBits=3` or `4`. Adjacent identical states
+remain separate, including across characters. Empty input returns no entries.
+Internal rendering may combine runs without changing this public result.
 This protocol output supports analysis and a future hardware FSK adapter;
 the adapter would own wall-clock scheduling and electrical polarity.
 
@@ -490,7 +508,8 @@ The proposed defaults are peak amplitude 0.5 of full scale, 250 ms lead-in,
 150 ms tail, a 5 ms raised-cosine burst ramp, and capacity for 4096 codes.
 Lead-in and tail include their respective ramps. Validate finite amplitude in
 `(0, 1]`, durations in `[0, 10 s]`, ramp at most half of both lead-in and tail,
-and queue capacity from 1 through 65536 codes. Zero ramp is an explicit option.
+and queue capacity from 1 through 65536 codes. Zero ramp is an explicit
+diagnostic option outside the qualified transmit profile.
 The default tail leaves margin beyond the proposed 100 ms receive-filter
 delay. Applications selecting a shorter tail take responsibility for the
 receivers and buffering involved; independent receiver tests qualify the
@@ -507,6 +526,13 @@ ErrWouldBlock)`. The first queued text starts one transmission: ramped mark
 lead-in, initial LTRS, and framed codes. Once active, an empty queue generates
 continuous mark until more text arrives or End is called. Queue boundaries
 do not insert extra lead-ins, reset letters/figures, or reset oscillator phase.
+
+Version 0.1 has no idle or total-transmission timeout. If the producer stops
+queuing text and never calls End or Close, continued ReadPCM calls produce
+mark indefinitely; queue capacity does not bound transmission duration. The
+application must enforce its own total-transmission deadline and PTT stop
+path, including producer failure and audio-loop failure. A library timeout is
+deferred and would not replace that independent application responsibility.
 
 `End` is idempotent and rejects further text with `ErrEnded`. It allows all
 queued frames and their full stop intervals to finish, then emits the tail
@@ -602,12 +628,38 @@ Acquire mark -> Detect falling transition -> Validate start
                          +---- failure -------+-> Reacquire
 ```
 
-Require a qualified mark interval before accepting a mark-to-space edge.
-Interpolate the edge position and validate space around half a bit later.
-Sample or integrate the data near 1.5, 2.5, 3.5, 4.5, and 5.5 bit periods
-after the edge. Evaluate stop mark around 6.5 bits and across the remaining
-configured stop interval, with a specified edge tolerance established by the
-clock-offset fixtures. Do not emit before the required stop evidence exists.
+Let `T` be the configured bit period, `t0` the interpolated start edge, and
+`S` the configured number of stop bits. Initial acquisition and the handoff
+between adjacent characters use different rules:
+
+1. On initial acquisition, after carrier loss, or after rejected framing,
+   require at least `1.0*T` of qualified mark before accepting a falling edge.
+   Validate the candidate start with space evidence around `t0 + 0.5*T`.
+2. Sample or integrate data near `t0 + (1.5 ... 5.5)*T`. Confirm stop mark
+   over the interval `t0 + [6.25, 6.75]*T`, centered on the 6.5-bit check.
+   Keep the resulting frame pending while testing the end of its stop.
+3. Arm the next-start detector at `t0 + (6 + S - 0.20)*T`. A falling edge
+   before this bound invalidates the pending frame. From this bound onward,
+   the already confirmed stop supplies mark qualification; do not demand
+   another acquisition interval. A next start must still pass the same
+   half-bit space validation as an initial start.
+4. The dense-traffic search window ends at `t0 + (6 + S + 0.20)*T`. If no
+   edge arrives in that window, continue in mark idle and accept a later
+   qualified falling edge without a timeout or a new lock-on delay.
+
+Emit the pending frame when either mark evidence reaches its nominal end
+`t0 + (6 + S)*T`, or an earlier next-start edge inside the permitted window
+has passed start validation. In the latter case, use that edge as EndSample.
+Do not require mark through the nominal end when a valid slightly faster
+sender has already begun the next character. If an early edge fails its
+start validation, reject the still-pending previous frame and reacquire.
+
+The initial early/late window is 0.20 bit (4.4 ms at the default baud).
+For 1.5 stop bits, the dense next-start interval is `[7.30, 7.70]*T`; for
+2 stop bits it is `[7.80, 8.20]*T`. These are explicit receiver tolerances,
+not changes to transmit framing. Clock-offset and shortened-stop fixtures
+qualify or revise the numerical tolerances before release; the distinct
+acquisition and inter-character rules remain part of the contract.
 
 Reset phase at each accepted character start. This gives an asynchronous
 receiver useful clock-error tolerance without needing a long uninterrupted
@@ -616,11 +668,13 @@ it must freeze during idle/fades and remain constrained around configured baud.
 
 The decoder must detect the next start while completing the previous stop,
 including back-to-back 1.5-stop-bit characters. A small ring of recent metrics
-supports fractional decisions and recovery after rejected candidates. Candidate
-start positions advance monotonically so rescanning cannot emit duplicates.
+supports the pending frame, fractional decisions, next-start validation, and
+recovery after rejected candidates. Candidate start positions advance
+monotonically so rescanning cannot emit duplicates.
 
-StopBits specifies the minimum stop interval accepted by this receiver.
-Longer mark intervals remain valid idle. Version 0.1 does not claim reception
+StopBits specifies the nominal stop interval, with the early-edge allowance
+defined above; it does not demand that every received stop last exactly its
+nominal duration. Longer mark intervals remain valid idle. Version 0.1 does not claim reception
 of one-stop-bit transmitters. A framing failure does not synthesize a question
 mark or guess a lost character; the diagnostic records the failure.
 
@@ -651,23 +705,86 @@ phase[n+1] = wrap(phase[n] + 2*pi*frequency[n]/Fs)
 sample[n]  = amplitude * envelope[n] * sin(phase[n])
 ```
 
-The version 0.1 waveform is continuous-phase binary FSK with a raised-cosine
-amplitude ramp only at burst boundaries. A data transition changes frequency,
-not phase. It does not ramp every bit and does not restart phase at every
-character or PCM call. Quantization to PCM16 is deterministic and saturating;
-the configured amplitude must not create clipping.
+Version 0.1 uses continuous-phase FSK with a 5 ms raised-cosine frequency
+transition at each logical tone change. For a transition beginning at `tb`,
+interpolate from the old tone `f0` to the new tone `f1` as:
+
+```text
+u = clamp((t - tb) / 0.005, 0, 1)
+frequency(t) = f0 + (f1 - f0) * (1 - cos(pi*u)) / 2
+```
+
+This transition finishes well before the next possible data transition at
+the initial baud rates. It changes frequency continuously while maintaining
+oscillator phase and constant amplitude during the payload. Keep the separate
+raised-cosine amplitude ramps at burst boundaries. Neither ramp state nor
+oscillator phase restarts at a character or buffer boundary. The half-bit
+symbol schedule is unchanged; the approximately 2.5 ms frequency-transition
+midpoint delay must be included in waveform timing and interoperability tests.
+
+PCM conversion is `clamp(roundToEven(32767 * sample[n]), -32768, 32767)`.
+The scale is explicitly 32767, so an ideal amplitude-one waveform spans
+`[-32767, 32767]` and never requires saturation. Saturation is defensive,
+not normal waveform shaping. Receive normalization remains division by
+32768; the small full-scale asymmetry is intentional. Test both extrema,
+rounding ties, and buffer-invariant output.
 
 This waveform deliberately has its own specification. Fldigi describes a
 different, separately shaped two-tone modulation approach; interoperability
 requires correct decoded data, not sample-for-sample equality with fldigi.
 [Fldigi modulator description](https://www.w1hkj.org/FldigiHelp/rtty_page.html).
-Alternative pulse shaping can be evaluated later with spectral and receiver
-measurements.
+The 5 ms transition is the selected first candidate for the spectral gate
+below, supported by a [preliminary waveform experiment](RTTY_TX_SPECTRUM.md).
+It still requires independent-receiver qualification. If it fails either
+interoperability or the spectral gate, revise shaping before releasing TX;
+do not ship abrupt frequency switching as an unqualified fallback.
 
 Measure tone frequency, transition timing, accumulated duration, burst
 envelope, and out-of-band spectrum independently of the receiver. Retain
 spectral plots and their measurement window/resolution for changes to shaping.
 Do not equate 170 Hz shift with a complete occupied-bandwidth specification.
+
+### Spectral acceptance
+
+The following is an engineering gate on generated PCM for the 170-Hz,
+45-baud profile. It is not a regulatory RF emission mask or a claim about
+a radio's subsequent audio and RF chain. Reference all levels to the total
+positive-frequency power of the same measured waveform, including any
+out-of-band energy, rather than to the height of a single FFT bin.
+
+| Measurement | Required maximum |
+| --- | ---: |
+| Combined power outside `fc +/- 250 Hz` | -40 dBc |
+| Combined power outside `fc +/- 500 Hz` | -55 dBc |
+| Power in any 10 Hz band wholly outside `fc +/- 250 Hz` | -45 dBc |
+
+For steady payload, use at least 60 seconds per pattern, a periodic Hann
+window of exactly one second, a one-second FFT, 50 percent overlap, and
+arithmetic averaging of linear one-sided power spectra. Bin spacing is 1 Hz
+and Hann equivalent noise bandwidth is 1.5 Hz. Integrate by bin-center
+frequency with no smoothing or peak normalization. The 10 Hz mask scans every
+ten-consecutive-bin interval wholly outside the specified central region.
+
+Exercise every repeated five-bit code, the repeated 0-through-31 sequence,
+seeded random codes, long idle followed by text, and representative text with
+shifts. Cover both sample rates, both stop selections, both baud presets,
+both polarities, multiple initial phases, and amplitudes 0.25, 0.5, and 1.0.
+Include the default center, passband-boundary centers, and a center offset
+by a fractional FFT bin. Do not average results across patterns to obtain a
+pass. Both normal and interrupted-queue payloads must meet the mask.
+
+Also measure whole finite bursts, including lead-in, tail, and amplitude
+ramps, with a rectangular analysis window enclosing the complete burst and
+zero-padding to give bin spacing at most 1 Hz. Apply the two integrated
+out-of-band limits to energy ratios over the whole burst. This prevents a
+payload-only Welch measurement from hiding key-up/down energy. Exercise
+single-character and short mixed-text bursts as well as longer traffic.
+
+The release gate qualifies the default burst settings. Nondefault ramp and
+lead/tail combinations need the same qualification before being advertised
+as transmit profiles; a zero-ramp diagnostic setting is not a qualified
+profile. Retain numeric measurements and spectra with each waveform revision.
+Stage 5 cannot pass on a visually narrow waterfall alone.
 
 Queue partition invariance applies when the same text is available before
 rendering reaches it: splitting a string across QueueText calls must produce
@@ -843,6 +960,10 @@ options, binary hash, alphabet, baud, stop bits, polarity, USOS, tuning, AFC,
 and squelch. Use isolated test configuration directories. Master-branch links
 in this proposal identify research sources; fixture manifests must use
 immutable revisions.
+Record the reference's original defaults separately from the explicit test
+settings, including the receive and transmit USOS switches. Run matched
+USOS-off and USOS-on receive comparisons; do not treat their different text
+interpretations as DSP errors.
 
 The first reference milestone must prove offline audio replay and complete
 output capture for the chosen fldigi build. Its documented XML-RPC control
@@ -877,10 +998,14 @@ digits-only text, punctuation, and joining a stream before a shift.
 
 Test start/data/stop ordering independently of PCM, exact rational duration,
 1.5 and 2 stop bits, longer idle, malformed stop intervals, and immediately
-adjacent frames. Check queue rollback, capacity after shift expansion,
-End/Close idempotence, reads with a one-sample destination, EOF with final
-samples, reset during every receive state, and independent simultaneous
-instances.
+adjacent frames. Assert the exact seven-entry FrameCodes result per code,
+including equal neighboring states. Test acquisition mark qualification
+separately from the inter-character window: early/late edges on each bound,
+shortened stops on both sides of the allowed threshold, one-stop rejection,
+and transitions split across chunks. Check queue rollback, capacity after
+shift expansion, End/Close idempotence, reads with a one-sample destination,
+EOF with final samples, reset during every receive state, and independent
+simultaneous instances.
 
 Fuzz configuration validation, text encoding, framing, lifecycle sequences,
 and bounded PCM streams. The meaningful invariants are no panic or hang,
@@ -914,7 +1039,7 @@ achievable across architectures.
 | Signal level | Quiet signals, normal headroom, gain steps, clipping |
 | Noise | Deterministic AWGN sweep, noise-only, band-limited noise |
 | Frequency | Nominal center, plus/minus 5 and 10 Hz fixed offset; later AFC captures |
-| Clock | Sample-rate error plus/minus 100 and 1000 ppm; independent baud mismatch |
+| Clock | Sample-rate error plus/minus 100 and 1000 ppm; isolated baud mismatch plus/minus 1 percent; margin exploration at plus/minus 2 and 3 percent |
 | Phase | Several oscillator phases and start positions within a sample/bit |
 | Fading | Unequal branch levels, selective fades, common fades, full carrier loss |
 | Interference | Nearby RTTY, single tone, impulsive bursts, out-of-band alias probes |
@@ -950,13 +1075,35 @@ The following are proposed release gates, not current results:
 | Clean protocol | Zero code/text errors on all golden vectors and independent clean fixtures |
 | Clean duration | At least 10,000 characters per advertised rate/stop combination with correct accumulated timing |
 | Bidirectional interoperability | go-rtty TX decoded correctly by fldigi and minimodem; their compatible TX fixtures decoded correctly by go-rtty |
+| Transmit spectrum | Every required waveform case meets the numeric limits and analysis procedure in Spectral acceptance |
 | Chunk/lifecycle behavior | Exact invariants described above for both sample rates and polarities |
 | Fixed-tuning tolerance | Zero errors on high-SNR fixtures at plus/minus 10 Hz and plus/minus 1000 ppm clock error, with factors tested alone and together |
-| False output | No printable characters on digital silence, mark-only, or space-only fixtures; at most one false printable character per hour on the specified noise-only suite with default squelch |
+| Timing stress | Zero errors on at least 10,000 back-to-back characters per stop selection at plus/minus 1 percent baud mismatch, with tone frequencies held fixed |
+| False output | No printable characters on digital silence, mark-only, or space-only fixtures; at most one false printable character in each one-hour run of the noise-only suite specified below |
 | Reception comparison | Aggregate held-out CER within 1 percentage point of pinned fldigi; no required condition group worse by more than 3 percentage points |
 | Corpus size | At least 20 distinct labelled recordings totalling 30,000 scored characters, with multiple transmitters and channel conditions |
 | Isolation | Concurrent independent instances and resource lifecycle checks pass |
 | Resource use | Sustained-stream memory reaches a plateau; queue and input errors preserve state |
+
+For each frozen noise-condition group and sample rate, run at least ten
+one-hour recordings with independent fixed seeds and default squelch. Include
+initial acquisition in every scoring interval and preserve state within each
+hour. Require every run to meet the false-output gate; report counts and
+timing per seed as well as the ten-hour aggregate. Freeze white/band-limited
+noise definitions and level groups in the manifest before tuning. Control-code
+observations are counted separately and retained in the report.
+
+This is an empirical acceptance gate on a minimum ten-hour suite per group,
+not a statistical assertion that the underlying rate is at most one per hour.
+Any statistical upper bound must state its confidence level and stochastic
+assumptions separately; false characters can arrive in correlated bursts.
+
+The plus/minus 1 percent stress changes symbol timing while leaving tones
+fixed, so it measures framing margin independently of tuning tolerance.
+Changing the capture sample clock also shifts apparent tone frequencies and
+must be reported separately. Characterize plus/minus 2 and 3 percent mismatch
+and stop shortening to expose the failure boundary without promising those
+conditions as supported reception.
 
 Report per-fixture counts and CER alongside aggregates and uncertainty, using
 recording-level resampling for confidence intervals. The initial comparison
@@ -980,6 +1127,7 @@ interval. Measure compute time and DSP buffering delay separately.
 On a named reference host, the initial targets for one decoder are real-time
 factor at most 0.10, p99 Process time below 10 ms for 20 ms input chunks, and
 added DSP delay at most 100 ms after enough real stop samples have arrived.
+This budget includes any lookahead used to validate an early next-start edge.
 The first character still requires its actual framing time, and the
 application's callback/device buffering adds further delay.
 
@@ -1095,8 +1243,8 @@ the explicit choice in
 The `only` suffix matters: it does not grant a choice of future GPL versions.
 [SPDX GPL version 3 only](https://spdx.org/licenses/GPL-3.0-only.html).
 
-The repository foundation should add the complete GPLv3 text and a concise
-licensing document. Original files should use:
+The complete GPLv3 text is in [LICENSE](../LICENSE). The repository foundation
+should also add a concise licensing document. Original files should use:
 
 ```text
 SPDX-FileCopyrightText: 2026 Marc L. Veary (7Q5MLV)
@@ -1118,11 +1266,10 @@ revisions, affected files, modifications, and retained licenses. A Go
 translation is not grounds to remove attribution. No clean-room claim will
 be made for source-derived work.
 
-Reference use alone does not make this a WSJT-X derivative; any derivative
-notice must name the work actually used. If fldigi code is ported or
-extracted, document that relationship explicitly. Third-party assets and
-recordings retain their own licenses and redistribution conditions; uncertain
-recording provenance prevents inclusion in the distributed corpus.
+If fldigi code is ported or extracted, document that relationship explicitly.
+Third-party assets and recordings retain their own licenses and redistribution
+conditions; uncertain recording provenance prevents inclusion in the
+distributed corpus.
 
 ## Delivery plan
 
@@ -1136,7 +1283,7 @@ work after reception correctness.
 | 2 Protocol codec | Explicit alphabet, shifts, strict text encoding, frame symbols, checked options/errors | All code/table/framing vectors pass independently of DSP |
 | 3 Receiver experiment | Go fixed-tuning detector and framing prototype evaluated against labelled audio | Measured baseline report; choose Go development or investigate modem extraction |
 | 4 Streaming receiver | Production lifecycle, arbitrary chunk processing, observations, squelch, diagnostics | Chunk/reset/ownership tests and independent receive fixtures pass |
-| 5 AFSK transmitter | Rational timing, continuous-phase PCM, bounded interactive queue, burst lifecycle | Independent receivers decode output; timing and spectrum checks pass |
+| 5 AFSK transmitter | Rational timing, shaped continuous-phase PCM, bounded interactive queue, burst lifecycle | Independent receivers decode output; timing checks and every numeric spectral limit pass |
 | 6 Reception and performance gate | Held-out corpus, noise/fading tests, profiling, documentation | Version 0.1 acceptance targets met or release remains experimental |
 | 7 Integration and release preparation | File tools, GoDoc/examples, CI matrix, version and release evidence | Documented contract works from a clean checkout; required checks recorded |
 | 8 Extended profiles | 50/75 baud, wider shifts, ITA2 profile, bounded AFC, possible native kernels | Separate interoperability, reception, portability, and performance gates |
@@ -1157,12 +1304,14 @@ defaults are frozen with the release corpus.
 | Alphabet variants can silently corrupt punctuation | Name profiles explicitly; test every figures code; reject unsupported profile selection |
 | Shift loss can corrupt many later characters | Retain raw codes and state provenance; test USOS and recovery; do not claim CRC-like certainty |
 | Filter latency can hide final characters | Specify measured delay, retain real trailer audio, and forbid synthetic flush characters |
+| Waveform shaping may affect spectrum and symbol detection differently | Require both the numeric spectral gate and independent-receiver results before releasing TX |
 | Native code may complicate build and ownership | Keep the Go path; gate native inclusion on whole-pipeline benefit and parity |
 | Numeric changes can change marginal decisions | Lock corpus/configuration and rerun backend comparisons before release |
 
-The remaining experimental choices are filter coefficients and lengths,
-envelope/ATC time constants, noise guard placement, exact start/stop decision
-tolerances, and final squelch defaults. They require measurements from the
+The remaining experimental choices are receive filter coefficients and lengths,
+envelope/ATC time constants, noise guard placement, and final squelch defaults.
+The specified start/stop tolerances and candidate transmit shaping also need
+qualification against their gates. These choices require measurements from the
 reference and receiver stages. The public ownership, timing, polarity,
 character, error, and discontinuity contracts above do not depend on those
 choices.
