@@ -7,9 +7,21 @@ control of their audio devices and station operation.
 
 ## Status
 
-The project is at the design stage. This repository contains the module
-definition, design document, license, and development instructions. The modem,
-public Go API, command-line tools, and test suite are not implemented yet.
+The project has its initial reference and development foundation: pinned
+external tools, independent protocol/audio fixtures, artifact validation tests,
+Task commands, and a Linux CI workflow. The modem, public `rtty` API, and
+encode/decode command-line tools are not implemented yet.
+
+The ordinary tests validate the retained evidence; they do not test a go-rtty
+modem. See the [reference recipe and validation record](docs/REFERENCE.md) and
+[corpus inventory](docs/CORPUS.md) for what has actually been exercised and
+what remains unperformed.
+
+An explicit [external corpus workflow](docs/REFERENCE.md#external-gritty-development-workflow)
+now fetches five checksum-pinned GRITTY recordings, prepares fixed 12/48 kHz
+derivatives, and captures unscored fldigi output. Audio and captures remain in a
+caller-selected external cache. Trusted transcripts and held-out reception
+validation are still outstanding.
 
 The [design document](docs/RTTY_DESIGN.md) specifies the proposed architecture,
 streaming contracts, receive and transmit processing, validation requirements,
@@ -95,9 +107,26 @@ Development will proceed through these stages:
 5. Meet the reception, interoperability, resource, and performance gates before
    preparing a release.
 
-Task-based commands and versioning will follow the `go-ft8` conventions as
-tooling is introduced. Task names in the design are proposals, not commands
-currently provided by this repository.
+The implemented Task commands follow the `go-ft8` naming conventions:
+
+```sh
+go test ./...
+CGO_ENABLED=0 go test ./...
+task check                 # version, Go/Python tests, vet, race
+task corpus:check          # offline Python tooling checks; optional resampler qualification
+task --list                # implemented tasks only
+task version:get
+```
+
+Use `GOCACHE=/tmp/go-build` if the default build cache is not writable. The
+ordinary suites need only Go 1.26 and the checked-in fixtures. Race checks
+also need a supported CGO toolchain. External reference checks additionally
+need the pinned executables and Python; see [REFERENCE.md](docs/REFERENCE.md).
+No task loads environment files or downloads tools implicitly.
+
+`version.txt` is an unreleased development identifier. Tagging, remote
+publication, receiver corpus gates, and benchmark tasks remain future work.
+Other task names in the design remain proposals until implemented.
 
 Read [AGENTS.md](AGENTS.md) for repository instructions and the
 [delivery plan](docs/RTTY_DESIGN.md#delivery-plan) for stage-specific exit gates.

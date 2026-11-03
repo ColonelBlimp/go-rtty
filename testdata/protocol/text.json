@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "description": "Manually specified examples of the planned go-rtty text contract, not minimodem defaults. No production encoder exists yet.",
+  "cases": [
+    {"name": "empty", "input": "", "normalized": "", "codes": []},
+    {"name": "alternating_shifts", "input": "a1a", "normalized": "A1A", "codes": [31, 3, 27, 23, 31, 3]},
+    {"name": "figures_first", "input": "123", "normalized": "123", "codes": [31, 27, 23, 19, 1]},
+    {"name": "figures_after_space", "input": "12 34", "normalized": "12 34", "codes": [31, 27, 23, 19, 4, 27, 1, 10]},
+    {"name": "us_figures", "input": "$#!'\";", "normalized": "$#!'\";", "codes": [31, 27, 9, 20, 13, 11, 17, 30]},
+    {"name": "line_endings", "input": "A\r\nB\n", "normalized": "A\r\nB\n", "codes": [31, 3, 8, 2, 25, 2]},
+    {"name": "controls", "input": "\u0000\u0007", "normalized": "\u0000\u0007", "codes": [31, 0, 27, 5]},
+    {"name": "space_only", "input": " ", "normalized": " ", "codes": [31, 4]}
+  ],
+  "invalid": [
+    {"input": "A\tB", "byte_offset": 1, "rune": 9},
+    {"input": "Aé", "byte_offset": 1, "rune": 233},
+    {"input": "CQ “", "byte_offset": 3, "rune": 8220},
+    {"input": "+", "byte_offset": 0, "rune": 43}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "text": "A1 A",
+  "data_lsb_first": [
+    "11111",
+    "11000",
+    "11011",
+    "11101",
+    "00100",
+    "11000"
+  ],
+  "diagnostics": "### CARRIER 45.45 @ 1590.0 Hz ###\n\n### NOCARRIER ndata=6 confidence=15.278 ampl=0.490 bps=45.45 (0.0% fast) ###\n",
+  "raw_diagnostics": "### CARRIER 45.45 @ 1590.0 Hz ###\n\n### NOCARRIER ndata=6 confidence=15.278 ampl=0.490 bps=45.45 (0.0% fast) ###\n"
+}

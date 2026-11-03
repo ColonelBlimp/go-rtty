@@ -1,0 +1,26 @@
+Build information:
+  built          : 4.2.06-1+deb13u1 by fldigi@Debian on x86_64-pc-linux-gnu for x86_64-pc-linux-gnu
+
+  configure flags: '--build=x86_64-linux-gnu' '--prefix=/usr' '--includedir=${prefix}/include' '--mandir=${prefix}/share/man' '--infodir=${prefix}/share/info' '--sysconfdir=/etc' '--localstatedir=/var' '--disable-option-checking' '--disable-silent-rules' '--libdir=${prefix}/lib/x86_64-linux-gnu' '--runstatedir=/run' '--disable-maintainer-mode' '--disable-dependency-tracking' '--with-libmbedtls' 'LIBMBEDTLS_CFLAGS=-I/usr/include/mbedtls' 'LIBMBEDTLS_LIBS=-lmbedtls -lmbedx509 -lmbedcrypto' 'build_alias=x86_64-linux-gnu' 'CXXFLAGS=-g -O2 -ffile-prefix-map=.=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection' 'LDFLAGS=-Wl,-z,relro' 'CPPFLAGS=-Wdate-time -D_FORTIFY_SOURCE=2' 'CFLAGS=-g -O2 -Werror=implicit-function-declaration -ffile-prefix-map=.=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection'
+
+  compiler       : gcc version 14.2.0 (Debian 14.2.0-19) 
+
+  compiler flags : -I$(srcdir) -I$(srcdir)/include -I$(srcdir)/irrxml -I$(srcdir)/libtiniconv -I$(srcdir)/fileselector -I$(srcdir)/xmlrpcpp -pthread -I/usr/include/cairo -I/usr/include/libpng16 -I/usr/include/freetype2 -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/cairo -I/usr/include/libpng16 -I/usr/include/freetype2 -I/usr/include/pixman-1 -I/usr/include/opus -I/usr/include/x86_64-linux-gnu -D_REENTRANT -I/usr/include/libusb-1.0 -I/usr/include/libpng16 -I/usr/include/mbedtls -pipe -Wall -fexceptions -O2 --param=max-vartrack-size=0 -I$(srcdir)/xmlrpcpp --param=max-vartrack-size=0 -DNDEBUG
+
+  linker flags   : -lportaudio -lasound -lm -lpthread -lfltk_images -lfltk -lX11 -lX11 -lsndfile -lsamplerate -lpulse-simple -lpulse -pthread -lhamlib -lpng16 -lmbedtls -lmbedx509 -lmbedcrypto -ludev
+
+  libraries      : FLTK 1.3.11
+                   libsamplerate 0.2.2
+                   libsndfile 1.2.2
+                   PortAudio 19
+                   PulseAudio 17.0
+                   Hamlib 4.6.2
+
+Runtime information:
+  system         : Linux dev-pc 7.2.13-200.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Oct 26 18:54:52 UTC 2026 x86_64
+
+  libraries      : libsamplerate-0.2.2 (c) 2002-2008 Erik de Castro Lopo
+                   libsndfile-1.2.2
+                   PortAudio V19.7.0-devel, revision unknown 1246976
+                   Pulseaudio 17.0.0
+                   Hamlib 4.6.2

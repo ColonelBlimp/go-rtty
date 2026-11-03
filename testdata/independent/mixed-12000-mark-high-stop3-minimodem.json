@@ -1,0 +1,24 @@
+{
+  "text": "A1A 23 $#!\r\n",
+  "data_lsb_first": [
+    "11111",
+    "11000",
+    "11011",
+    "11101",
+    "11111",
+    "11000",
+    "00100",
+    "11011",
+    "11001",
+    "10000",
+    "00100",
+    "11011",
+    "10010",
+    "00101",
+    "10110",
+    "00010",
+    "01000"
+  ],
+  "diagnostics": "### CARRIER 45.45 @ 1590.0 Hz ###\n\n### NOCARRIER ndata=17 confidence=15.835 ampl=0.490 bps=45.45 (0.0% fast) ###\n",
+  "raw_diagnostics": "### CARRIER 45.45 @ 1590.0 Hz ###\n\n### NOCARRIER ndata=17 confidence=15.835 ampl=0.490 bps=45.45 (0.0% fast) ###\n"
+}

@@ -1,0 +1,37 @@
+alphabet-us.csv is a transcription of the US letters/figures tables in
+fldigi 4.2.06, src/rtty/rtty.cxx. Control entries are named rather than encoded
+as C character literals; explicit wire bit strings are original additions.
+Source archive SHA-256:
+4360de225d6f8cfeb9bb6a5be6ac492e52702c8f704f87609c452d3bcb1b6c08
+
+Original notice:
+
+Copyright (C) 2012
+    Dave Freese, W1HKJ
+    Stefan Fendt, DL1SMF
+
+This file is part of fldigi.
+
+This code bears some resemblance to code contained in gmfsk from which
+it originated. Much has been changed, but credit should still be
+given to Tomi Manninen (oh2bns@sral.fi), who so graciously distributed
+his gmfsk modem under the GPL.
+
+Fldigi is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Fldigi is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with fldigi. If not, see <http://www.gnu.org/licenses/>.
+
+SPDX-License-Identifier: GPL-3.0-or-later
+
+Original additions, framing.json and text.json:
+SPDX-FileCopyrightText: 2026 Marc L. Veary (7Q5MLV)
+SPDX-License-Identifier: GPL-3.0-only

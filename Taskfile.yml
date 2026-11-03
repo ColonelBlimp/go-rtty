@@ -1,0 +1,108 @@
+# SPDX-FileCopyrightText: 2026 Marc L. Veary (7Q5MLV)
+# SPDX-License-Identifier: GPL-3.0-only
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+includes:
+  version: ./Taskfile.version.yml
+
+tasks:
+  default:
+    desc: List available tasks.
+    cmds:
+      - task --list
+
+  test:
+    desc: Run the ordinary Go suite (currently reference artifact validation).
+    cmds:
+      - go test ./...
+
+  test:purego:
+    desc: Run the suite with CGO disabled.
+    env:
+      CGO_ENABLED: '0'
+    cmds:
+      - go test ./...
+
+  test:smoke:
+    desc: Run the small, offline foundation suite.
+    cmds:
+      - task: test
+
+  test:smoke-purego:
+    desc: Run the offline foundation suite with CGO disabled.
+    cmds:
+      - task: test:purego
+
+  test:race:
+    desc: Run the Go race detector (requires a supported CGO toolchain).
+    cmds:
+      - go test -race ./...
+
+  vet:
+    desc: Run go vet.
+    cmds:
+      - go vet ./...
+
+  reference:minimodem:
+    desc: Reproduce the checked-in fixtures and decode them with pinned minimodem.
+    requires:
+      vars: [RTTY_MINIMODEM]
+    cmds:
+      - python3 scripts/reference.py verify-minimodem
+
+  reference:fldigi:
+    desc: Replay fixtures in pinned fldigi using an isolated Xvfb display (Linux).
+    requires:
+      vars: [RTTY_FLDIGI, RTTY_XVFB]
+    cmds:
+      - python3 scripts/fldigi-replay.py
+
+  test:oracle:
+    desc: Run both external reference checks; requires pinned tools and Xvfb.
+    cmds:
+      - task: reference:minimodem
+      - task: reference:fldigi
+
+  corpus:fetch:
+    desc: Explicitly download checksum-pinned GRITTY originals into an external cache.
+    requires:
+      vars: [RTTY_CORPUS]
+    cmds:
+      - python3 scripts/corpus.py fetch
+
+  corpus:prepare:
+    desc: Reproduce pinned 12/48 kHz derivatives offline with pinned libsamplerate.
+    requires:
+      vars: [RTTY_CORPUS, RTTY_SAMPLERATE]
+    cmds:
+      - python3 scripts/corpus.py prepare
+
+  corpus:verify:
+    desc: Verify all external originals and derivatives offline; missing files fail.
+    requires:
+      vars: [RTTY_CORPUS]
+    cmds:
+      - python3 scripts/corpus.py verify
+
+  corpus:replay:
+    desc: Capture unscored GRITTY output in fldigi at 12 kHz with both USOS policies.
+    requires:
+      vars: [RTTY_CORPUS, RTTY_FLDIGI, RTTY_XVFB]
+    cmds:
+      - python3 scripts/corpus.py replay
+
+  corpus:check:
+    desc: Offline corpus-tool tests; resampler qualification runs only when configured.
+    cmds:
+      - python3 -B -m unittest discover -s scripts -p '*_test.py'
+
+  check:
+    desc: Run local foundation checks; this is not a modem release gate.
+    cmds:
+      - task: version:check
+      - task: test
+      - task: test:purego
+      - task: corpus:check
+      - task: vet
+      - task: test:race

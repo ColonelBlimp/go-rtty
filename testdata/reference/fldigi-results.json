@@ -1,0 +1,349 @@
+{
+  "schema_version": 1,
+  "adapter": "unmodified-application-x11-playback",
+  "executable_sha256": "75265d69717b23ab4067b181f80960abbccc4946326c7b6eeecf41d53a142d8d",
+  "results": [
+    {
+      "fixture": "mixed-12000-mark-high-stop3",
+      "wav_sha256": "a4fbe1d43702f0bdf7b7364560a1f9ab28c377d5bcfcc872f03f6dd35dee5f24",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "bcaa9004c1406571d90619b678e05946489c87fd2ece9f240b1f77e298321a4f",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-12000-mark-high-stop3",
+      "wav_sha256": "a4fbe1d43702f0bdf7b7364560a1f9ab28c377d5bcfcc872f03f6dd35dee5f24",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06114638e9ef9541b5792f158491b85d58e2ce793a470f78fecff17e0003acc4",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-12000-mark-high-stop4",
+      "wav_sha256": "9ac275cd8d52a736c18ba49b1a7204cf2b180e789b9154f79586b2edf899a6b4",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>2</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "e238ccb67b0cff8fa57155ad75ba1b9504590b898a9dd20e969ac2488d1b3910",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-12000-mark-high-stop4",
+      "wav_sha256": "9ac275cd8d52a736c18ba49b1a7204cf2b180e789b9154f79586b2edf899a6b4",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>2</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06338dce594f9599d2b42f35069f726ae820dff4473e3b65f0c683605898e251",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-12000-mark-low-stop3",
+      "wav_sha256": "c3d11a5961bcb6e0e67215cbf0c24c203bd15c4617dfbb1e5eb93941cea62911",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "bcaa9004c1406571d90619b678e05946489c87fd2ece9f240b1f77e298321a4f",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": true,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-12000-mark-low-stop3",
+      "wav_sha256": "c3d11a5961bcb6e0e67215cbf0c24c203bd15c4617dfbb1e5eb93941cea62911",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06114638e9ef9541b5792f158491b85d58e2ce793a470f78fecff17e0003acc4",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": true,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-12000-mark-low-stop4",
+      "wav_sha256": "d27bb48a4bc8473a4b329efd635d1e0b42a8593f59c0486325610cfa0ea79634",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>2</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "e238ccb67b0cff8fa57155ad75ba1b9504590b898a9dd20e969ac2488d1b3910",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": true,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-12000-mark-low-stop4",
+      "wav_sha256": "d27bb48a4bc8473a4b329efd635d1e0b42a8593f59c0486325610cfa0ea79634",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>2</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06338dce594f9599d2b42f35069f726ae820dff4473e3b65f0c683605898e251",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": true,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-48000-mark-high-stop3",
+      "wav_sha256": "df82d042e4d4b8839ccca48fd575b00c16c4126d3f27d90d37b993d29505e2a7",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "bcaa9004c1406571d90619b678e05946489c87fd2ece9f240b1f77e298321a4f",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-48000-mark-high-stop3",
+      "wav_sha256": "df82d042e4d4b8839ccca48fd575b00c16c4126d3f27d90d37b993d29505e2a7",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06114638e9ef9541b5792f158491b85d58e2ce793a470f78fecff17e0003acc4",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-48000-mark-high-stop4",
+      "wav_sha256": "bffe89069fd24cf3330ab1d64fafcc813e5203e979fb5ded0fe7ff0756a71551",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>2</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "e238ccb67b0cff8fa57155ad75ba1b9504590b898a9dd20e969ac2488d1b3910",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-48000-mark-high-stop4",
+      "wav_sha256": "bffe89069fd24cf3330ab1d64fafcc813e5203e979fb5ded0fe7ff0756a71551",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>2</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06338dce594f9599d2b42f35069f726ae820dff4473e3b65f0c683605898e251",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-48000-mark-low-stop3",
+      "wav_sha256": "e3de44c2840dd114316a632913dc6f3cdee2ebe60e7e983318be8912bbb17a58",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "bcaa9004c1406571d90619b678e05946489c87fd2ece9f240b1f77e298321a4f",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": true,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-48000-mark-low-stop3",
+      "wav_sha256": "e3de44c2840dd114316a632913dc6f3cdee2ebe60e7e983318be8912bbb17a58",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06114638e9ef9541b5792f158491b85d58e2ce793a470f78fecff17e0003acc4",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": true,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-48000-mark-low-stop4",
+      "wav_sha256": "0059e6d16c8bd7dfbb1bd31ae230a37eb80e1cd7e113115b373085c5db48dd1c",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>2</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "e238ccb67b0cff8fa57155ad75ba1b9504590b898a9dd20e969ac2488d1b3910",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": true,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "mixed-48000-mark-low-stop4",
+      "wav_sha256": "0059e6d16c8bd7dfbb1bd31ae230a37eb80e1cd7e113115b373085c5db48dd1c",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>2</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06338dce594f9599d2b42f35069f726ae820dff4473e3b65f0c683605898e251",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": true,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1A 23 $#!\n",
+      "actual_widget_text": "A1A 23 $#!\n",
+      "pass": true
+    },
+    {
+      "fixture": "usos-12000-mark-high-stop3",
+      "wav_sha256": "aeb5c3e2d023a47f55ffed6b6ade5428a0440466df29c44752a136e8ce3823fb",
+      "version": "4.2.06",
+      "rx_usos": false,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>0</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "bcaa9004c1406571d90619b678e05946489c87fd2ece9f240b1f77e298321a4f",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1 -",
+      "actual_widget_text": "A1 -",
+      "pass": true
+    },
+    {
+      "fixture": "usos-12000-mark-high-stop3",
+      "wav_sha256": "aeb5c3e2d023a47f55ffed6b6ade5428a0440466df29c44752a136e8ce3823fb",
+      "version": "4.2.06",
+      "rx_usos": true,
+      "tx_usos": false,
+      "configuration_xml": "<?xml version=\"1.0\"?>\n<FLDIGI_DEFS>\n<AUDIOIO>3</AUDIOIO>\n<RTTYSHIFT>3</RTTYSHIFT>\n<RTTYBAUD>1</RTTYBAUD>\n<RTTYBITS>0</RTTYBITS>\n<RTTYPARITY>0</RTTYPARITY>\n<RTTYSTOP>1</RTTYSTOP>\n<UOSRX>1</UOSRX>\n<UOSTX>0</UOSTX>\n<RTTYAUTOCRLF>0</RTTYAUTOCRLF>\n<RTTYCRCLF>0</RTTYCRCLF>\n<RX_LOWERCASE>0</RX_LOWERCASE>\n<KAHNDEMOD>1</KAHNDEMOD>\n<RTTYBW>68</RTTYBW>\n<RTTYFILTER>1.25</RTTYFILTER>\n<RTTYCWI>0</RTTYCWI>\n<PSKREP_AUTOSTART>0</PSKREP_AUTOSTART>\n<USEPSKREP>0</USEPSKREP>\n<CHKUSEHAMLIBIS>0</CHKUSEHAMLIBIS>\n<CHKUSERIGCATIS>0</CHKUSERIGCATIS>\n<CHKUSEXMLRPCIS>0</CHKUSEXMLRPCIS>\n</FLDIGI_DEFS>\n",
+      "configuration_sha256": "06114638e9ef9541b5792f158491b85d58e2ce793a470f78fecff17e0003acc4",
+      "state": {
+        "modem": "RTTY",
+        "carrier_hz": 1500,
+        "reverse": false,
+        "afc": false,
+        "squelch": false
+      },
+      "expected_widget_text": "A1 A",
+      "actual_widget_text": "A1 A",
+      "pass": true
+    }
+  ]
+}

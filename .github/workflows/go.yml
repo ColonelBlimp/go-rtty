@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2026 Marc L. Veary (7Q5MLV)
+# SPDX-License-Identifier: GPL-3.0-only
+name: Go
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - run: go test ./...
+      - run: go test ./...
+        env:
+          CGO_ENABLED: '0'
+      - run: go vet ./...
+      - run: go test -race ./...
+      - name: Check offline corpus tools
+        run: python3 -B -m unittest discover -s scripts -p '*_test.py'
+      - name: Check Go formatting
+        shell: bash
+        run: |
+          files=$(git ls-files '*.go')
+          test -z "$(gofmt -l $files)"

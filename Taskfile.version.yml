@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Marc L. Veary (7Q5MLV)
+# SPDX-License-Identifier: GPL-3.0-only
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+tasks:
+  get:
+    desc: Print the development version (without a leading v).
+    silent: true
+    cmds:
+      - cat version.txt
+
+  check:
+    desc: Check the version file uses SemVer without a leading v.
+    cmds:
+      - go test ./internal/reference -run '^TestVersion$' -count=1

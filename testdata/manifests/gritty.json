@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "description": "External GRITTY development recordings. Unlabelled, unscored; no reception acceptance result.",
+  "source_page": "https://dxatlas.com/Gritty/Demo/",
+  "retrieved_utc_date": "2026-11-03",
+  "redistribution_status": "No explicit redistribution grant identified; audio and captures remain external.",
+  "partition_policy": "All five recordings and their derivatives are development material, inspected during harness bring-up. No held-out set has been acquired.",
+  "conversion": {
+    "tool": "samplerate",
+    "library_sha256": "2c6ac93554ae3297ad18e81d377c39d291141e4d40a73e6f7281e49a7fcb033b",
+    "settings": {
+      "input_rate": 6000,
+      "output_rates": [
+        12000,
+        48000
+      ],
+      "input_gain": 0.5,
+      "converter_type": 0,
+      "end_of_input": 1,
+      "channels": 1,
+      "rounding": "src_float_to_short_array"
+    },
+    "configuration_sha256": "e3bf28bfdbb88e8f3d7b0058ec746e4fc04ae656e646194a811dadba73da3aa9",
+    "boundary_mapping": "output sample boundary = original sample boundary * output_rate / 6000",
+    "delay_policy": "Offline src_simple, complete input with end_of_input=1. No additional trimming or padding. Exact integer-ratio frame count required; edge transients retained.",
+    "clipping_policy": "Fixed 0.5 input gain; reject any resampled float magnitude >= 1 before PCM16 rounding."
+  },
+  "reference_profile": {
+    "baud_numerator": 909,
+    "baud_denominator": 20,
+    "shift_hz": 170,
+    "data_bits": 5,
+    "start_bits": 1,
+    "alphabet": "US",
+    "afc": false,
+    "squelch": false,
+    "rx_usos": [
+      false,
+      true
+    ],
+    "tx_usos": false,
+    "bandwidth_hz": 68,
+    "filter_factor": 1.25
+  },
+  "settings_basis": "Provisional development settings. Spectral inspection plus exploratory pinned minimodem decoding selected the source-page target, not necessarily the strongest signal. No transcript or measured framing claim.",
+  "fixtures": [
+    {
+      "id": "sx150itu_2015-04-13-135142",
+      "target": "SX150ITU",
+      "condition": "strong-cq-and-quiet",
+      "recording_group": "gritty-2015-04-13",
+      "partition": "development",
+      "label_status": "unlabelled",
+      "scored_ranges": [],
+      "original": {
+        "path": "original/sx150itu_2015-04-13-135142.wav",
+        "url": "https://dxatlas.com/Gritty/Demo/SX150ITU_2015-04-13%20135142.wav",
+        "sha256": "181b5930f40e2d536bb4946d32cb8080b648d57668fd94a09c86430fd6b29f1a",
+        "bytes": 720006,
+        "sample_rate": 6000,
+        "sample_count": 359936
+      },
+      "reference_settings": {
+        "carrier_hz": 2193,
+        "mark_hz": 2108,
+        "space_hz": 2278,
+        "stop_half_bits": 3
+      },
+      "derived": [
+        {
+          "path": "prepared/sx150itu_2015-04-13-135142-12000.wav",
+          "sha256": "67b7e7026b05a177bdacb25c0918c7a923c54459c48cfa9172289a339dc67eb1",
+          "bytes": 1439788,
+          "sample_rate": 12000,
+          "sample_count": 719872
+        },
+        {
+          "path": "prepared/sx150itu_2015-04-13-135142-48000.wav",
+          "sha256": "1d93ae93cc4a1a07ec7020e8247688dd8595d093c154bb808d4169fb697d7d42",
+          "bytes": 5759020,
+          "sample_rate": 48000,
+          "sample_count": 2879488
+        }
+      ]
+    },
+    {
+      "id": "ii1sap_2015-04-13-131007",
+      "target": "II1SAP",
+      "condition": "fading",
+      "recording_group": "gritty-2015-04-13",
+      "partition": "development",
+      "label_status": "unlabelled",
+      "scored_ranges": [],
+      "original": {
+        "path": "original/ii1sap_2015-04-13-131007.wav",
+        "url": "https://dxatlas.com/Gritty/Demo/II1SAP_2015-04-13%20131007.wav",
+        "sha256": "44b25defc738a0d4c614d8dfcac4cfa8228f22ee3e4335bbfd0a185d5e0a230e",
+        "bytes": 720006,
+        "sample_rate": 6000,
+        "sample_count": 359936
+      },
+      "reference_settings": {
+        "carrier_hz": 2153,
+        "mark_hz": 2068,
+        "space_hz": 2238,
+        "stop_half_bits": 3
+      },
+      "derived": [
+        {
+          "path": "prepared/ii1sap_2015-04-13-131007-12000.wav",
+          "sha256": "1c109a45bcc007123d5c7e4e810b5be43d9b804b26052709a27c0a3dac10190b",
+          "bytes": 1439788,
+          "sample_rate": 12000,
+          "sample_count": 719872
+        },
+        {
+          "path": "prepared/ii1sap_2015-04-13-131007-48000.wav",
+          "sha256": "ceab61083ea5c66e22ca12654e19fc2e6ea7dc8b02bcd505cccc425beb25c636",
+          "bytes": 5759020,
+          "sample_rate": 48000,
+          "sample_count": 2879488
+        }
+      ]
+    },
+    {
+      "id": "r120rb_2015-04-13-125938",
+      "target": "R120RB",
+      "condition": "weak-deep-fading",
+      "recording_group": "gritty-2015-04-13",
+      "partition": "development",
+      "label_status": "unlabelled",
+      "scored_ranges": [],
+      "original": {
+        "path": "original/r120rb_2015-04-13-125938.wav",
+        "url": "https://dxatlas.com/Gritty/Demo/R120RB_2015-04-13%20125938.wav",
+        "sha256": "3bd1e709135e27d8516dba78180bf2d761949f10afb12322d20e46ef70be26f2",
+        "bytes": 720006,
+        "sample_rate": 6000,
+        "sample_count": 359936
+      },
+      "reference_settings": {
+        "carrier_hz": 2204,
+        "mark_hz": 2119,
+        "space_hz": 2289,
+        "stop_half_bits": 3
+      },
+      "derived": [
+        {
+          "path": "prepared/r120rb_2015-04-13-125938-12000.wav",
+          "sha256": "b9c29e365cf6269bf24590c6cad0e2f46e196cf97d51075e111c9b43e426014d",
+          "bytes": 1439788,
+          "sample_rate": 12000,
+          "sample_count": 719872
+        },
+        {
+          "path": "prepared/r120rb_2015-04-13-125938-48000.wav",
+          "sha256": "69bcd054a9c14004d90a7ac07b2ca3ae385ebfd9f4bbd6bdb71d122ce4269992",
+          "bytes": 5759020,
+          "sample_rate": 48000,
+          "sample_count": 2879488
+        }
+      ]
+    },
+    {
+      "id": "pa4ps_2015-03-22-164743",
+      "target": "PA4PS",
+      "condition": "crowded-passband",
+      "recording_group": "gritty-2015-03-22",
+      "partition": "development",
+      "label_status": "unlabelled",
+      "scored_ranges": [],
+      "original": {
+        "path": "original/pa4ps_2015-03-22-164743.wav",
+        "url": "https://dxatlas.com/Gritty/Demo/PA4PS_2015-03-22%20164743.wav",
+        "sha256": "83192bf3adbed8fdcde4135495a43ef916c515a159254dc17ad522aa568bd382",
+        "bytes": 720006,
+        "sample_rate": 6000,
+        "sample_count": 359936
+      },
+      "reference_settings": {
+        "carrier_hz": 2192,
+        "mark_hz": 2107,
+        "space_hz": 2277,
+        "stop_half_bits": 3
+      },
+      "derived": [
+        {
+          "path": "prepared/pa4ps_2015-03-22-164743-12000.wav",
+          "sha256": "59908b28e1809cc6234ddb8b531fdf64b7d12818b277d2be595a96a2997bf16a",
+          "bytes": 1439788,
+          "sample_rate": 12000,
+          "sample_count": 719872
+        },
+        {
+          "path": "prepared/pa4ps_2015-03-22-164743-48000.wav",
+          "sha256": "cac9440dd802e46595a8f41317f17c32228a13d90454aa40f21c343cbb340030",
+          "bytes": 5759020,
+          "sample_rate": 48000,
+          "sample_count": 2879488
+        }
+      ]
+    },
+    {
+      "id": "dl2al_2015-03-22-171224",
+      "target": "DL2AL",
+      "condition": "receiver-clipping",
+      "recording_group": "gritty-2015-03-22",
+      "partition": "development",
+      "label_status": "unlabelled",
+      "scored_ranges": [],
+      "original": {
+        "path": "original/dl2al_2015-03-22-171224.wav",
+        "url": "https://dxatlas.com/Gritty/Demo/DL2AL_2015-03-22%20171224.wav",
+        "sha256": "98df3afb6ae8484f82217293f20efdb671b7f3148e8f68a6b58d6a4fe89c8200",
+        "bytes": 720006,
+        "sample_rate": 6000,
+        "sample_count": 359936
+      },
+      "reference_settings": {
+        "carrier_hz": 2193,
+        "mark_hz": 2108,
+        "space_hz": 2278,
+        "stop_half_bits": 3
+      },
+      "derived": [
+        {
+          "path": "prepared/dl2al_2015-03-22-171224-12000.wav",
+          "sha256": "1bc69cfdc68926c0fddcc3adc01ab903a2e07af52e0d3aec2bbe8b42fe3befe2",
+          "bytes": 1439788,
+          "sample_rate": 12000,
+          "sample_count": 719872
+        },
+        {
+          "path": "prepared/dl2al_2015-03-22-171224-48000.wav",
+          "sha256": "b038f5117c256017a7a1053a746b8d535de176c50bb90272679f171cbc77d919",
+          "bytes": 5759020,
+          "sample_rate": 48000,
+          "sample_count": 2879488
+        }
+      ]
+    }
+  ]
+}

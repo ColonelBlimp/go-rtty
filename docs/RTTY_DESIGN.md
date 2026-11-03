@@ -28,6 +28,12 @@ The APIs, thresholds, release stages, and performance numbers below are design
 contracts and proposed acceptance targets. They are not implementation or
 benchmark results.
 
+Implementation status (2 November 2026): the initial reference foundation now
+provides pinned tools, protocol/audio fixtures, artifact checks, Task commands,
+and a CI definition. The [reference validation record](REFERENCE.md) describes
+the checks actually run and the outstanding labelled-HF-corpus work. The
+public modem package and the API examples below remain unimplemented.
+
 ## Relationship to go-ft8
 
 The baseline is the local `go-ft8` tree at

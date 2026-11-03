@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "description": "Literal mark/space levels at successive half-bit intervals; 0 is space, 1 is mark. No lead-in, tail, or automatic shifts.",
+  "cases": [
+    {"code": 0, "stop_half_bits": 3, "levels": "000000000000111", "boundary_half_bits": [0, 2, 4, 6, 8, 10, 12, 15]},
+    {"code": 3, "stop_half_bits": 3, "levels": "001111000000111", "boundary_half_bits": [0, 2, 4, 6, 8, 10, 12, 15]},
+    {"code": 21, "stop_half_bits": 3, "levels": "001100110011111", "boundary_half_bits": [0, 2, 4, 6, 8, 10, 12, 15]},
+    {"code": 31, "stop_half_bits": 3, "levels": "001111111111111", "boundary_half_bits": [0, 2, 4, 6, 8, 10, 12, 15]},
+    {"code": 0, "stop_half_bits": 4, "levels": "0000000000001111", "boundary_half_bits": [0, 2, 4, 6, 8, 10, 12, 16]},
+    {"code": 3, "stop_half_bits": 4, "levels": "0011110000001111", "boundary_half_bits": [0, 2, 4, 6, 8, 10, 12, 16]},
+    {"code": 21, "stop_half_bits": 4, "levels": "0011001100111111", "boundary_half_bits": [0, 2, 4, 6, 8, 10, 12, 16]},
+    {"code": 31, "stop_half_bits": 4, "levels": "0011111111111111", "boundary_half_bits": [0, 2, 4, 6, 8, 10, 12, 16]}
+  ]
+}

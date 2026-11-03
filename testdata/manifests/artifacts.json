@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "files": {
+    "protocol/alphabet-us.csv": "86b362b82cd595262b98ab05484d421a81d60677cdc9dafc018098ab54cb9df9",
+    "protocol/framing.json": "aaca8fe30ebfb44d29aa5684b680fbfc9830b523d2af75a146fabe7b1eb56824",
+    "protocol/text.json": "3e9aaad860732da8fcb59660a5eccdb712e622d424dddc74f697f2d68703b9e9",
+    "independent/mixed.txt": "c4bb217d2f6fb94d07da391de142f1112e24f807d8cf1002ff13e9adcceca82b",
+    "independent/usos.txt": "026db1893aff0ab4260e91ebf7a82daf576acaec3f095656ce187d02efc5df28",
+    "protocol/NOTICE": "246faae6ca6a5c75f46ab7d9441f5fbd1ba1900fe667ec6f0187c6894ac991f3",
+    "reference/fldigi-results.json": "15c1f78d408d79721c83f4e297edbb5305186980dcc1ac027871b1729f7d185f",
+    "reference/fldigi-build.txt": "5c372e3a97f601ec62ba2783b8754c1ef52a7f14240b5914cec4e0be1f81ea7c"
+  }
+}

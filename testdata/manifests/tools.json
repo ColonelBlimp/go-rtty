@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "tools": [
+    {
+      "name": "minimodem",
+      "version": "0.24",
+      "license": "GPL-3.0-or-later",
+      "platform": "linux-amd64",
+      "package": {
+        "url": "https://deb.debian.org/debian/pool/main/m/minimodem/minimodem_0.24-1+b2_amd64.deb",
+        "sha256": "1d247986092e743381861e7737d6b865ed91ee7f6eeec798ae455636184a104d"
+      },
+      "source": {
+        "url": "https://deb.debian.org/debian/pool/main/m/minimodem/minimodem_0.24.orig.tar.gz",
+        "sha256": "f8cca4db8e3f284d67f843054d6bb4d88a3db5e77b26192410e41e9a06f4378e"
+      },
+      "executable": "usr/bin/minimodem",
+      "executable_sha256": "7fc392caf42af778f1e0e014d384427a7f83f2d9caba47f1a3c5f56de9ebba2d"
+    },
+    {
+      "name": "fldigi",
+      "version": "4.2.06",
+      "license": "GPL-3.0-or-later",
+      "platform": "linux-amd64",
+      "package": {
+        "url": "https://deb.debian.org/debian/pool/main/f/fldigi/fldigi_4.2.06-1+deb13u1_amd64.deb",
+        "sha256": "3ad5c85b32089a088e875d4a6fb913f4613bdeff068cfa60ca7890c4a18de330"
+      },
+      "source": {
+        "url": "https://deb.debian.org/debian/pool/main/f/fldigi/fldigi_4.2.06.orig.tar.gz",
+        "sha256": "4360de225d6f8cfeb9bb6a5be6ac492e52702c8f704f87609c452d3bcb1b6c08"
+      },
+      "executable": "usr/bin/fldigi",
+      "executable_sha256": "75265d69717b23ab4067b181f80960abbccc4946326c7b6eeecf41d53a142d8d"
+    },
+    {
+      "name": "samplerate",
+      "version": "0.2.2",
+      "license": "BSD-2-Clause",
+      "platform": "linux-amd64",
+      "package": {
+        "url": "https://deb.debian.org/debian/pool/main/libs/libsamplerate/libsamplerate0_0.2.2-4+b2_amd64.deb",
+        "sha256": "2665417fa996c1e249dbaa65c32305ac666e5ae865fad0f109b629935ec0bd18"
+      },
+      "source": {
+        "url": "https://deb.debian.org/debian/pool/main/libs/libsamplerate/libsamplerate_0.2.2.orig.tar.gz",
+        "sha256": "16e881487f184250deb4fcb60432d7556ab12cb58caea71ef23960aec6c0405a"
+      },
+      "executable": "usr/lib/x86_64-linux-gnu/libsamplerate.so.0.2.2",
+      "executable_sha256": "2c6ac93554ae3297ad18e81d377c39d291141e4d40a73e6f7281e49a7fcb033b"
+    }
+  ],
+  "runtime_packages": [
+    {
+      "url": "https://deb.debian.org/debian/pool/main/f/fltk1.3/libfltk-images1.3t64_1.3.11-2_amd64.deb",
+      "sha256": "4d5c4a1ffbc30b61b078568093e595544d0d4530f0c23a8b0c5428592d647f90"
+    },
+    {
+      "url": "https://deb.debian.org/debian/pool/main/f/fltk1.3/libfltk1.3t64_1.3.11-2_amd64.deb",
+      "sha256": "0d90fb887407cf5ed3d60c71c27246dd601457990001cf9b074059431511d991"
+    },
+    {
+      "url": "https://deb.debian.org/debian/pool/main/h/hamlib/libhamlib4t64_4.6.2-1+b1_amd64.deb",
+      "sha256": "2c2819d587df16fc9bcc00f76b327982c79e15308d388c2aea0a877f4fec7937"
+    },
+    {
+      "url": "https://deb.debian.org/debian/pool/main/m/mbedtls/libmbedcrypto16_3.6.6-0.1~deb13u1_amd64.deb",
+      "sha256": "b38baf2ecaca7b28b3005d34b8108ee9b17681426b20662813995e939aea6dfa"
+    },
+    {
+      "url": "https://deb.debian.org/debian/pool/main/m/mbedtls/libmbedtls21_3.6.6-0.1~deb13u1_amd64.deb",
+      "sha256": "9e280505afa5f5aa7034e494e7466c82d8e9af2eb3bf2edf46bab0bd7b62e1ac"
+    },
+    {
+      "url": "https://deb.debian.org/debian/pool/main/m/mbedtls/libmbedx509-7_3.6.6-0.1~deb13u1_amd64.deb",
+      "sha256": "e0b6630efcf9eae2e05172496576bc3235be134a6bbf8da4cf3570fba65f65b8"
+    },
+    {
+      "url": "https://deb.debian.org/debian/pool/main/x/xorg-server/xvfb_21.1.16-1.3+deb13u4_amd64.deb",
+      "sha256": "893d87bf159b6de077a929fc796a73c39f837d45310b2076e3eeebebb80552b6"
+    }
+  ]
+}
