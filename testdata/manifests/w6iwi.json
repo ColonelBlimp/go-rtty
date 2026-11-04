@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "description": "External W6IWI HF development recordings. Source-described test patterns; no trusted aligned transcripts or scored reception results.",
+  "source_page": "https://w6iwi.org/rtty/audio/",
+  "retrieved_utc_date": "2026-11-04",
+  "redistribution_status": "Page invites demodulator testing; no explicit audio redistribution grant identified. Originals, derivatives and captures remain external.",
+  "partition_policy": "All three recordings and their derivatives are development material inspected during intake. No held-out assignment or evidence is claimed.",
+  "conversion": {
+    "tool": "samplerate",
+    "library_sha256": "2c6ac93554ae3297ad18e81d377c39d291141e4d40a73e6f7281e49a7fcb033b",
+    "settings": {
+      "input_rate": 8000,
+      "output_rates": [
+        12000,
+        48000
+      ],
+      "input_gain": 0.5,
+      "converter_type": 0,
+      "end_of_input": 1,
+      "channels": 1,
+      "rounding": "src_float_to_short_array"
+    },
+    "configuration_sha256": "01f607183ae05fd08a4162a21934e2252158d605063c4081abaf21be71dc68fd",
+    "boundary_mapping": "output sample boundary = floor(original sample boundary * output_rate / 8000)",
+    "delay_policy": "Offline src_simple with complete input and end_of_input=1. No trimming or padding; floor(input_frames * output_rate / input_rate) output frames required. Filter edge transients retained.",
+    "clipping_policy": "Fixed 0.5 input gain; reject any resampled float magnitude >= 1 before PCM16 rounding."
+  },
+  "reference_profile": {
+    "baud_numerator": 909,
+    "baud_denominator": 20,
+    "shift_hz": 170,
+    "data_bits": 5,
+    "start_bits": 1,
+    "alphabet": "US",
+    "afc": false,
+    "squelch": false,
+    "rx_usos": [
+      false,
+      true
+    ],
+    "tx_usos": false,
+    "bandwidth_hz": 68,
+    "filter_factor": 1.25
+  },
+  "settings_basis": "Provisional fixed reference settings: 45.45 baud, US figures and 1.5 stops are comparator settings, not measured transmitter parameters. Exploratory two-second Hann spectra identified the 40 m tone pair near 2050/2220 Hz, and 20 m/RY near 2125/2295 Hz. Mark-low assignments are supported by exploratory minimodem text. Exact baud, stop timing and transmitted controls remain unverified.",
+  "fixtures": [
+    {
+      "id": "w6iwi-qbf-40m-20220315",
+      "target": "W6IWI qbf-40m",
+      "condition": "fading",
+      "recording_group": "w6iwi-2022-03-15",
+      "partition": "development",
+      "label_status": "unlabelled",
+      "scored_ranges": [],
+      "source_description": "TU-170 test tape transmitted from Tucson, Arizona; received at KFS SDR. Source describes 50 W on 40 m into a random-length wire, with severe fading.",
+      "source_pattern": "Quick Brown Fox repeated 100 times; exact tape text and controls are not supplied.",
+      "original": {
+        "path": "original/w6iwi-qbf-40m-20220315.wav",
+        "url": "https://w6iwi.org/rtty/audio/websdr_recording_2022-03-15T05_45_16Z_7086.0kHz.wav",
+        "sha256": "2902cb613d86e93c6faa5c1dad6b0e9ce6bd73b230289689e8b5d2ebfab29ba6",
+        "bytes": 25090604,
+        "sample_rate": 8000,
+        "sample_count": 12545280,
+        "riff_size_overstatement_bytes": 8
+      },
+      "reference_settings": {
+        "carrier_hz": 2135,
+        "mark_hz": 2050,
+        "space_hz": 2220,
+        "stop_half_bits": 3
+      },
+      "derived": [
+        {
+          "path": "prepared/w6iwi-qbf-40m-20220315-12000.wav",
+          "sha256": "9833f898f0c91c2bad111c173c14de62771b9e4f04bfbeffd5ffd3e22546661f",
+          "bytes": 37635884,
+          "sample_rate": 12000,
+          "sample_count": 18817920
+        },
+        {
+          "path": "prepared/w6iwi-qbf-40m-20220315-48000.wav",
+          "sha256": "afecb01a51449a4ea3c0438239e2381adb6f75b3978e74bced5ac84c38e35c03",
+          "bytes": 150543404,
+          "sample_rate": 48000,
+          "sample_count": 75271680
+        }
+      ]
+    },
+    {
+      "id": "w6iwi-qbf-20m-20220614",
+      "target": "W6IWI qbf-20m",
+      "condition": "hf-noise-and-fading",
+      "recording_group": "w6iwi-2022-06-14",
+      "partition": "development",
+      "label_status": "unlabelled",
+      "scored_ranges": [],
+      "source_description": "TU-170 test tape transmitted from Tucson, Arizona; received at KFS SDR. Source describes 90 W on 20 m into an inverted L.",
+      "source_pattern": "Quick Brown Fox repeated 100 times; exact tape text and controls are not supplied.",
+      "original": {
+        "path": "original/w6iwi-qbf-20m-20220614.wav",
+        "url": "https://w6iwi.org/rtty/audio/websdr_recording_2022-06-14T23_08_37Z_14086.0kHz.wav",
+        "sha256": "cb4f117b3c4adbeb428f00dc51d06622f793400ab6323eb5520c5b94f5f26484",
+        "bytes": 37209644,
+        "sample_rate": 8000,
+        "sample_count": 18604800,
+        "riff_size_overstatement_bytes": 8
+      },
+      "reference_settings": {
+        "carrier_hz": 2210,
+        "mark_hz": 2125,
+        "space_hz": 2295,
+        "stop_half_bits": 3
+      },
+      "derived": [
+        {
+          "path": "prepared/w6iwi-qbf-20m-20220614-12000.wav",
+          "sha256": "50fb3980281a6983fb42894268b293c8c5e7a8c7ef4b16c896adbca3c8125edf",
+          "bytes": 55814444,
+          "sample_rate": 12000,
+          "sample_count": 27907200
+        },
+        {
+          "path": "prepared/w6iwi-qbf-20m-20220614-48000.wav",
+          "sha256": "a63c1e065ea92aa352b43f0f1ff3126ba17c51f6f580732d46647d8fdf18f665",
+          "bytes": 223257644,
+          "sample_rate": 48000,
+          "sample_count": 111628800
+        }
+      ]
+    },
+    {
+      "id": "w6iwi-ry-170-20240415",
+      "target": "W6IWI ry-170",
+      "condition": "low-power-hf",
+      "recording_group": "w6iwi-2024-04-15",
+      "partition": "development",
+      "label_status": "unlabelled",
+      "scored_ranges": [],
+      "source_description": "Source describes 4 W from Tucson into a 30-foot vertical, received at KFS SDR.",
+      "source_pattern": "30 lines, 35 RY pairs per line, with TEST DE W6IWI before each line. Exact control stream and timing are not supplied.",
+      "original": {
+        "path": "original/w6iwi-ry-170-20240415.wav",
+        "url": "https://w6iwi.org/rtty/audio/websdr_recording_2024-04-15T23_12_30Z_14089.1kHz.wav",
+        "sha256": "293b3cf6d82410f46ca028f9fe66351fc659fb4e3ad6ccaf5d864cc4ccc52027",
+        "bytes": 9050156,
+        "sample_rate": 8000,
+        "sample_count": 4525056,
+        "riff_size_overstatement_bytes": 8
+      },
+      "reference_settings": {
+        "carrier_hz": 2210,
+        "mark_hz": 2125,
+        "space_hz": 2295,
+        "stop_half_bits": 3
+      },
+      "derived": [
+        {
+          "path": "prepared/w6iwi-ry-170-20240415-12000.wav",
+          "sha256": "1fda949abadff891c45d2c0947bf6d4bc2c9aee2dab8d6ed041c0c3d8f99dd9f",
+          "bytes": 13575212,
+          "sample_rate": 12000,
+          "sample_count": 6787584
+        },
+        {
+          "path": "prepared/w6iwi-ry-170-20240415-48000.wav",
+          "sha256": "13032400b4ee1e81c8a38597dd2bac56b551d315cc7b9e33420eeb76b225b5cc",
+          "bytes": 54300716,
+          "sample_rate": 48000,
+          "sample_count": 27150336
+        }
+      ]
+    }
+  ],
+  "source_snapshot_sha256": "dfe9c8c53ae5246684bdf8b1a0c8306e71d41a7c043102abfd1603a3ae3cc2ba",
+  "original_container_note": "All three WebSDR originals overstate RIFF size by eight bytes. The fmt/data chunks and declared PCM sample payloads are complete. This anomaly is explicitly allowed only through original artifact metadata; originals are never rewritten. Derived WAVs have standard RIFF sizes."
+}

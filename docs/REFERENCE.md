@@ -129,10 +129,12 @@ After fetching the pinned tools and setting the variables above:
 
 ```sh
 export RTTY_CORPUS=/tmp/go-rtty-corpus
+export RTTY_CORPUS_SET=gritty # also the default when unset
 task corpus:fetch       # the only corpus command that accesses the network
 task corpus:prepare     # offline; produces and checks both 12 and 48 kHz WAVs
 task corpus:verify      # offline; checks all originals and derivatives
 task corpus:replay      # full 12 kHz playback, both receive USOS policies
+task corpus:minimodem   # full 12 kHz text/raw-code capture, RX USOS always on
 ```
 
 Run these sequentially. The cache must be outside the repository, including
@@ -191,6 +193,69 @@ is explicitly skipped. `task check` and ordinary CI include these Python tests;
 neither requires external audio or a GUI. The ordinary Go suites validate the
 manifest's pins, format/timing relationships, and unlabelled development status.
 
+## External W6IWI development workflow
+
+[`w6iwi.json`](../testdata/manifests/w6iwi.json) pins three complete HF originals
+and six derivatives. Select this set explicitly; existing commands default to
+GRITTY. With the pinned tools and library environment configured above:
+
+```sh
+export RTTY_CORPUS=/tmp/go-rtty-corpus
+export RTTY_CORPUS_SET=w6iwi
+task corpus:fetch
+task corpus:prepare
+task corpus:verify
+task corpus:minimodem
+# Optional full fldigi run: about 149 minutes of audio across both USOS policies.
+task corpus:replay
+```
+
+These tasks operate on complete recordings. Fetch verifies existing files
+without network access and refuses to replace corrupt files. The original
+8 kHz WAVs have a documented eight-byte RIFF length overstatement; only the
+explicitly annotated original artifacts permit it, and complete PCM payloads
+are still required. No original bytes are rewritten.
+
+The same pinned `src_simple` converter uses fixed 0.5 gain and produces 12/48 kHz
+PCM16, with exactly `floor(input_frames * output_rate / input_rate)` frames.
+The 8-to-12 kHz ratio is 3/2. Sample-range boundaries map using the same floor
+formula; no extra delay compensation, trimming, padding, or normalization is
+applied. Impulse alignment, output duration (including odd input lengths), and
+interior DC gain are qualified for both 6 and 8 kHz inputs. This development
+conversion does not add 8 kHz support to the planned public modem API.
+
+`corpus:minimodem` captures complete text and raw codes in separate decoder
+runs. Its report pins source/derived audio, executable, driver, tool manifest,
+and argument arrays and preserves diagnostics. Its RX USOS is always on in
+the pinned minimodem build. Outputs remain `captured-unscored` with zero scored
+characters; neither decoder agreement nor the source's test-pattern description
+establishes an aligned transcript. Both capture commands refuse an existing
+output report and retain failures without overwriting earlier runs.
+
+For a selected fixture or receive policy, invoke the script directly:
+
+```sh
+python3 scripts/corpus.py replay --corpus w6iwi \
+  --fixture w6iwi-ry-170-20240415 --rx-usos off \
+  --output reports/w6iwi-ry-12000-off.json
+python3 scripts/corpus.py replay --corpus w6iwi \
+  --fixture w6iwi-ry-170-20240415 --rx-usos on \
+  --output reports/w6iwi-ry-12000-on.json
+python3 scripts/corpus.py minimodem --corpus w6iwi --sample-rate 48000 \
+  --output reports/w6iwi-minimodem-48000.json
+```
+
+Each fldigi replay uses a fresh receiver and an isolated display. The 40 m
+fixture uses center 2135 Hz, mark-low; the other two use 2210 Hz, mark-low.
+Other comparator settings match the qualified profile. These remain provisional
+receive settings, not claims of measured transmitter baud or stop length.
+
+The W6IWI default reports are `reports/w6iwi-12000.json` for fldigi and
+`reports/w6iwi-minimodem-12000.json` for minimodem, relative to the cache. Explicit
+`--rx-usos off` or `on` adds a policy suffix to the default fldigi filename.
+The command-line `--corpus` selection is independent of the Task-only
+`RTTY_CORPUS_SET` variable.
+
 ## Validation record and remaining gates
 
 The foundation was exercised on 2 November 2026, Linux amd64, Fedora 44,
@@ -228,12 +293,53 @@ explicitly skipped. Re-extraction from cached packages reproduced all three
 pinned tool/library hashes. The updated CI definition remains locally checked
 only; it has not been run on GitHub.
 
+On 4 November 2026 the W6IWI intake verified three complete mono PCM16 8 kHz
+originals (4,459.392 seconds total) and six 12/48 kHz derivatives. Repeated
+preparation reproduced all six hashes; all ten existing GRITTY derivative
+hashes also remained unchanged. The 8 kHz rational conversion passed impulse,
+duration, and DC-gain qualification, including odd input lengths. The three
+source container anomalies are explicitly annotated and covered by a
+truncated-payload rejection test.
+
+Pinned minimodem captured the complete W6IWI originals during exploration,
+then the full 12 and 48 kHz derivatives using the repeatable corpus command.
+The retained derivative reports are external:
+
+| Report beneath `RTTY_CORPUS` | SHA-256 |
+| --- | --- |
+| `reports/w6iwi-minimodem-12000.json` | `678bd6e4cfcd15f259f5e523c5a07b176334af9f3a5d979f49cab36b72381e98` |
+| `reports/w6iwi-minimodem-48000.json` | `76e3b1ffec8c569d00b8794f76ba0d094d4e44f458ffc40352a382b7552f0f0a` |
+| `reports/w6iwi-ry-12000-off-retry.json` | `b377e975fca549d55e109fcecf3ba2a76fe35ede1f59a41386d46dc004b28222` |
+| `reports/w6iwi-ry-12000-on.json` | `458a59b59d99ff035603e148fe15f6145e6fd012142f63c0543e3b6b0f4bd7b7` |
+
+The complete 565.632-second RY derivative was replayed in fldigi at 12 kHz
+with USOS off and on. Each capture retained 2,366 widget bytes and verified
+the receiver settings. Both contain errors and remain unscored. Their matching
+driver snapshot is retained externally at `source-pages/ry-replay-driver.py`
+(SHA-256 `95a3212da7d804a11076f1a529dcc84d90263263ee4e3ec13b4d50459a9ec5d0`).
+The initial sandboxed Xvfb startup failed before playback; its failure report
+was retained, and the off-policy retry used a new report path. Full fldigi
+replays of both W6IWI Quick Brown Fox recordings and of the W6IWI 48 kHz
+derivatives remain unperformed.
+
+The current `task check` passed ordinary and CGO-disabled Go tests, vet, race,
+and all ten Python tests with the pinned resampler configured. Without that
+library configured, its one qualification test was explicitly skipped. All
+nine clean minimodem fixtures reproduced exactly and all 18 clean fldigi
+comparisons passed in the restored reference environment. No go-rtty modem
+or chunk-invariance test is implied by these tooling checks.
+
+Commit review widened the manifest test's sample-count arithmetic to 64 bits
+to avoid overflow on 32-bit hosts. Ordinary and CGO-disabled Go suites passed
+again, as did the targeted manifest test with `GOARCH=386 CGO_ENABLED=0`.
+
 Still unperformed: trusted labelled HF recordings and held-out reception
 comparisons, go-rtty protocol/DSP/streaming implementation and chunk invariance,
 fldigi-generated TX fixtures, go-rtty bidirectional interoperability, transmit
 spectral qualification, false-output hours, and performance/resource gates.
 No native backend or public package is introduced by this foundation. Five
-GRITTY originals have now been acquired in an external development cache;
+GRITTY and three W6IWI originals have now been acquired in an external
+development cache;
 trusted labels, held-out recordings, and redistribution terms remain unresolved.
 Stage 1's labelled-corpus work is incomplete. The [candidate-source review and
 admission plan](CORPUS.md#candidate-recording-sources) records the remaining

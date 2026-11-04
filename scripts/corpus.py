@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Marc L. Veary (7Q5MLV)
 # SPDX-License-Identifier: GPL-3.0-only
-"""Explicit acquisition, conversion and unscored replay of external GRITTY audio.
+"""Explicit acquisition, conversion and unscored replay of external RTTY audio.
 
 Only fetch accesses the network. No command changes the checked-in manifest.
 Audio, logs and captures must live outside the repository.
@@ -17,6 +17,7 @@ import json
 import os
 from pathlib import Path
 import struct
+import subprocess
 import sys
 import tempfile
 import urllib.request
@@ -25,7 +26,7 @@ import wave
 sys.dont_write_bytecode = True
 import reference
 
-MANIFEST = reference.DATA / "manifests/gritty.json"
+MANIFESTS = {name: reference.DATA / f"manifests/{name}.json" for name in ("gritty", "w6iwi")}
 CONVERSION = {"input_rate": 6000, "output_rates": [12000, 48000], "input_gain": 0.5,
               "converter_type": 0, "end_of_input": 1, "channels": 1,
               "rounding": "src_float_to_short_array"}
@@ -35,13 +36,14 @@ REFERENCE_PROFILE = {"baud_numerator": 909, "baud_denominator": 20, "shift_hz": 
                      "bandwidth_hz": 68, "filter_factor": 1.25}
 
 
-def manifest():
-    data = json.loads(MANIFEST.read_text())
+def manifest(name="gritty"):
+    data = json.loads(MANIFESTS[name].read_text())
     if data["schema_version"] != 1:
         raise ValueError("unsupported corpus manifest version")
-    if data["conversion"]["settings"] != CONVERSION:
+    conversion = {**CONVERSION, "input_rate": 6000 if name == "gritty" else 8000}
+    if data["conversion"]["settings"] != conversion:
         raise ValueError("conversion recipe differs from this adapter")
-    settings_hash = reference.digest(json.dumps(CONVERSION, sort_keys=True, separators=(",", ":")).encode())
+    settings_hash = reference.digest(json.dumps(conversion, sort_keys=True, separators=(",", ":")).encode())
     library_hash = next(t["executable_sha256"] for t in reference.lock()["tools"] if t["name"] == "samplerate")
     if data["conversion"]["configuration_sha256"] != settings_hash or data["conversion"]["library_sha256"] != library_hash:
         raise ValueError("corpus conversion pin differs from the tool/recipe lock")
@@ -87,7 +89,10 @@ def publish(path, data):
 
 
 def pcm(data, artifact):
-    if len(data) < 12 or data[:4] != b"RIFF" or data[8:12] != b"WAVE" or struct.unpack_from("<I", data, 4)[0] + 8 != len(data):
+    # W6IWI's three pinned WebSDR originals overstate RIFF length by eight
+    # bytes. Preserve them byte-for-byte; the data chunk must still be complete.
+    overstatement = artifact.get("riff_size_overstatement_bytes", 0)
+    if overstatement not in (0, 8) or len(data) < 12 or data[:4] != b"RIFF" or data[8:12] != b"WAVE" or struct.unpack_from("<I", data, 4)[0] + 8 != len(data) + overstatement:
         raise ValueError("invalid RIFF size or format")
     with wave.open(io.BytesIO(data), "rb") as source:
         if (source.getnchannels(), source.getsampwidth(), source.getframerate(), source.getnframes(), source.getcomptype()) != (1, 2, artifact["sample_rate"], artifact["sample_count"], "NONE"):
@@ -127,15 +132,17 @@ class Resampler:
         self.lib.src_float_to_short_array.restype = None
 
     def convert(self, raw, input_rate, output_rate):
-        if output_rate not in CONVERSION["output_rates"] or input_rate != CONVERSION["input_rate"]:
+        if output_rate not in CONVERSION["output_rates"] or input_rate not in (6000, 8000):
             raise ValueError("unsupported corpus conversion rate")
         samples = array.array("h", raw)
         if sys.byteorder != "little":
             samples.byteswap()
         n = len(samples)
-        count = n * (output_rate // input_rate)
+        count = n * output_rate // input_rate
         # Fixed 0.5 gain before interpolation, no per-file normalization.
-        incoming = (ctypes.c_float * n)(*(sample / 32768.0 * CONVERSION["input_gain"] for sample in samples))
+        # Avoid expanding long recordings into millions of Python arguments.
+        floats = array.array("f", (sample / 32768.0 * CONVERSION["input_gain"] for sample in samples))
+        incoming = (ctypes.c_float * n).from_buffer(floats)
         outgoing = (ctypes.c_float * (count + 256))()
         state = SRCData(incoming, outgoing, n, len(outgoing), 0, 0, CONVERSION["end_of_input"], output_rate / input_rate)
         error = self.lib.src_simple(ctypes.byref(state), CONVERSION["converter_type"], CONVERSION["channels"])
@@ -197,7 +204,58 @@ def verify(cache, fixtures):
         print(f"VERIFIED cached audio {fixture['id']}", flush=True)
 
 
-def replay(cache, fixtures, rate, output):
+def minimodem_capture(cache, fixtures, rate, output, *, corpus_name="gritty"):
+    """Capture full text and raw codes; neither is a trusted transcript."""
+    executable = reference.checked_tool("minimodem")
+    output = cache_path(cache, output)
+    if output.exists():
+        raise ValueError(f"output already exists: {output}")
+    report = {"schema_version": 1, "kind": "unscored-minimodem-capture",
+              "status": "running", "corpus": corpus_name,
+              "started_utc": datetime.now(timezone.utc).isoformat(),
+              "manifest_sha256": reference.digest(MANIFESTS[corpus_name].read_bytes()),
+              "driver_sha256": reference.digest(Path(__file__).read_bytes()),
+              "tools_manifest_sha256": reference.digest((reference.DATA / "manifests/tools.json").read_bytes()),
+              "executable_sha256": reference.digest(Path(executable).read_bytes()),
+              "sample_rate": rate, "results": []}
+    try:
+        for fixture in fixtures:
+            original = fixture["original"]
+            pcm(checked_bytes(cache_path(cache, original["path"]), original), original)
+            derived = next(d for d in fixture["derived"] if d["sample_rate"] == rate)
+            source = cache_path(cache, derived["path"])
+            pcm(checked_bytes(source, derived), derived)
+            settings = fixture["reference_settings"]
+            args = ["--rx", "45.45", "--baudot", "--startbits", "1", "--stopbits",
+                    str(settings["stop_half_bits"] / 2), "--mark", str(settings["mark_hz"]),
+                    "--space", str(settings["space_hz"]), "--bandwidth", "10",
+                    "--confidence", "1.5", "--limit", "2.3", "--file", str(source)]
+            text_result = reference.run(executable, args)
+            code_result = reference.run(executable, ["--binary-output", *args])
+            words = code_result.stdout.decode("ascii").splitlines()
+            if any(len(word) != 5 or set(word) - {"0", "1"} for word in words):
+                raise ValueError("invalid minimodem raw-code capture")
+            report["results"].append({
+                "fixture": fixture["id"], "original_sha256": original["sha256"],
+                "wav_sha256": derived["sha256"], "args": args,
+                "binary_args": ["--binary-output", *args], "rx_usos": True,
+                "actual_text": text_result.stdout.decode("ascii"),
+                "actual_codes": [int(word[::-1], 2) for word in words],
+                "text_diagnostics": text_result.stderr.decode("ascii"),
+                "code_diagnostics": code_result.stderr.decode("ascii"),
+                "status": "captured-unscored", "scored_characters": 0})
+            print(f"CAPTURED minimodem {fixture['id']}: {len(words)} codes; unscored", flush=True)
+        report["status"] = "captured-unscored"
+    except BaseException as error:
+        report["status"] = "failed"
+        report["error"] = str(error)
+        raise
+    finally:
+        publish(output, (json.dumps(report, indent=2) + "\n").encode())
+        print(f"Capture report: {output}", flush=True)
+
+
+def replay(cache, fixtures, rate, output, *, corpus_name="gritty", rx_usos=(0, 1)):
     # Importing the adapter does not launch tools or access the network.
     spec = importlib.util.spec_from_file_location("fldigi_replay", Path(__file__).with_name("fldigi-replay.py"))
     adapter = importlib.util.module_from_spec(spec)
@@ -222,7 +280,8 @@ def replay(cache, fixtures, rate, output):
     work = Path(tempfile.mkdtemp(prefix="replay-", dir=output.parent))
     report = {"schema_version": 1, "kind": "unscored-reference-capture", "status": "running",
               "started_utc": datetime.now(timezone.utc).isoformat(),
-              "manifest_sha256": reference.digest(MANIFEST.read_bytes()),
+              "corpus": corpus_name,
+              "manifest_sha256": reference.digest(MANIFESTS[corpus_name].read_bytes()),
               "driver_sha256": reference.digest(Path(__file__).read_bytes()),
               "tools_manifest_sha256": reference.digest((reference.DATA / "manifests/tools.json").read_bytes()),
               "adapter_sha256": reference.digest(Path(adapter.__file__).read_bytes()),
@@ -234,7 +293,7 @@ def replay(cache, fixtures, rate, output):
             for fixture, derived, source in inputs:
                 settings = fixture["reference_settings"]
                 replay_fixture = {"id": fixture["id"], **derived, **settings}
-                for usos in [0, 1]:
+                for usos in rx_usos:
                     print(f"REPLAY {fixture['id']} {rate} Hz USOS={usos} (unscored)", flush=True)
                     result = adapter.replay(executable, replay_fixture, usos, display,
                                             work / (fixture["id"] + f"-{usos}"),
@@ -253,26 +312,39 @@ def replay(cache, fixtures, rate, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["fetch", "prepare", "verify", "replay"])
+    parser.add_argument("command", choices=["fetch", "prepare", "verify", "replay", "minimodem"])
+    parser.add_argument("--corpus", choices=MANIFESTS, default="gritty")
     parser.add_argument("--cache", type=Path, default=os.environ.get("RTTY_CORPUS"))
     parser.add_argument("--fixture", help="select one recording by manifest ID")
     parser.add_argument("--sample-rate", type=int, choices=[12000, 48000], default=12000,
                         help="replay input rate; prepare always produces both rates")
     parser.add_argument("--output",
                         help="new capture report path relative to the external cache")
+    parser.add_argument("--rx-usos", choices=["both", "off", "on"], default="both",
+                        help="replay receive USOS policy; each run starts a fresh receiver")
     args = parser.parse_args()
     try:
         if not args.cache:
             raise ValueError("set RTTY_CORPUS or pass --cache")
         cache = external_cache(args.cache)
-        fixtures = [f for f in manifest()["fixtures"] if not args.fixture or f["id"] == args.fixture]
+        fixtures = [f for f in manifest(args.corpus)["fixtures"] if not args.fixture or f["id"] == args.fixture]
         if not fixtures:
             raise ValueError("unknown fixture")
+        if args.command != "replay" and args.rx_usos != "both":
+            raise ValueError("--rx-usos only applies to fldigi replay; minimodem always enables RX USOS")
         if args.command == "replay":
-            replay(cache, fixtures, args.sample_rate, args.output or f"reports/gritty-{args.sample_rate}.json")
+            policies = {"both": (0, 1), "off": (0,), "on": (1,)}[args.rx_usos]
+            suffix = "" if args.rx_usos == "both" else f"-{args.rx_usos}"
+            replay(cache, fixtures, args.sample_rate,
+                   args.output or f"reports/{args.corpus}-{args.sample_rate}{suffix}.json",
+                   corpus_name=args.corpus, rx_usos=policies)
+        elif args.command == "minimodem":
+            minimodem_capture(cache, fixtures, args.sample_rate,
+                              args.output or f"reports/{args.corpus}-minimodem-{args.sample_rate}.json",
+                              corpus_name=args.corpus)
         else:
             {"fetch": fetch, "prepare": prepare, "verify": verify}[args.command](cache, fixtures)
-    except (ValueError, OSError, RuntimeError, wave.Error) as error:
+    except (ValueError, OSError, RuntimeError, wave.Error, subprocess.SubprocessError) as error:
         parser.exit(1, f"corpus: {error}\n")
 
 

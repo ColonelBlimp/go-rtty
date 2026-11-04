@@ -18,10 +18,11 @@ modem. See the [reference recipe and validation record](docs/REFERENCE.md) and
 what remains unperformed.
 
 An explicit [external corpus workflow](docs/REFERENCE.md#external-gritty-development-workflow)
-now fetches five checksum-pinned GRITTY recordings, prepares fixed 12/48 kHz
-derivatives, and captures unscored fldigi output. Audio and captures remain in a
-caller-selected external cache. Trusted transcripts and held-out reception
-validation are still outstanding.
+fetches five checksum-pinned GRITTY recordings and
+[three W6IWI HF tests](docs/REFERENCE.md#external-w6iwi-development-workflow),
+prepares fixed 12/48 kHz derivatives, and supports unscored fldigi and minimodem
+captures. Audio and captures remain in a caller-selected external cache.
+Trusted aligned transcripts and held-out reception validation are outstanding.
 
 The [design document](docs/RTTY_DESIGN.md) specifies the proposed architecture,
 streaming contracts, receive and transmit processing, validation requirements,

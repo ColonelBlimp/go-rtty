@@ -3,6 +3,9 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: '3'
 
+vars:
+  CORPUS: '{{default "gritty" .RTTY_CORPUS_SET}}'
+
 includes:
   version: ./Taskfile.version.yml
 
@@ -65,32 +68,39 @@ tasks:
       - task: reference:fldigi
 
   corpus:fetch:
-    desc: Explicitly download checksum-pinned GRITTY originals into an external cache.
+    desc: Download pinned external recordings (RTTY_CORPUS_SET=gritty or w6iwi).
     requires:
       vars: [RTTY_CORPUS]
     cmds:
-      - python3 scripts/corpus.py fetch
+      - python3 scripts/corpus.py fetch --corpus '{{.CORPUS}}'
 
   corpus:prepare:
     desc: Reproduce pinned 12/48 kHz derivatives offline with pinned libsamplerate.
     requires:
       vars: [RTTY_CORPUS, RTTY_SAMPLERATE]
     cmds:
-      - python3 scripts/corpus.py prepare
+      - python3 scripts/corpus.py prepare --corpus '{{.CORPUS}}'
 
   corpus:verify:
     desc: Verify all external originals and derivatives offline; missing files fail.
     requires:
       vars: [RTTY_CORPUS]
     cmds:
-      - python3 scripts/corpus.py verify
+      - python3 scripts/corpus.py verify --corpus '{{.CORPUS}}'
 
   corpus:replay:
-    desc: Capture unscored GRITTY output in fldigi at 12 kHz with both USOS policies.
+    desc: Capture unscored corpus output in fldigi at 12 kHz with both USOS policies.
     requires:
       vars: [RTTY_CORPUS, RTTY_FLDIGI, RTTY_XVFB]
     cmds:
-      - python3 scripts/corpus.py replay
+      - python3 scripts/corpus.py replay --corpus '{{.CORPUS}}'
+
+  corpus:minimodem:
+    desc: Capture unscored corpus text and raw codes with pinned minimodem at 12 kHz.
+    requires:
+      vars: [RTTY_CORPUS, RTTY_MINIMODEM]
+    cmds:
+      - python3 scripts/corpus.py minimodem --corpus '{{.CORPUS}}'
 
   corpus:check:
     desc: Offline corpus-tool tests; resampler qualification runs only when configured.

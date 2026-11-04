@@ -16,6 +16,7 @@ establishes artifact integrity and consistency, not modem interoperability.
 | USOS probe | `A1 A`, six frames, 12 kHz, mark-high, 1.5 stops | The transmitted codes are `[31,3,27,23,4,3]`. Expected text is `A1 A` with receive USOS on and `A1 -` with it off. |
 | Second receiver | All nine WAVs replayed in unmodified fldigi, with both USOS policies | 18 exact widget-text comparisons; full captured output and configuration hashes in `testdata/reference/fldigi-results.json`. CRLF is displayed as LF. |
 | External corpus manifest | Five GRITTY originals and ten 12/48 kHz derivatives; audio and captures stored externally | Source/derived hashes, provisional tuning, conversion recipe, and development-only assignments in `testdata/manifests/gritty.json`. No trusted labels or scored reception result. |
+| W6IWI external manifest | Three HF originals and six 12/48 kHz derivatives; audio and captures stored externally | Source-described test patterns, hashes, provisional tuning, and an explicit WebSDR container exception in `testdata/manifests/w6iwi.json`. No trusted aligned transcripts or scored ranges. |
 
 Minimodem's TX USOS behavior can omit an explicit LTRS after a space. Its
 output must not be used as the expected code stream of the planned go-rtty
@@ -59,18 +60,21 @@ raw-code output to the fixed expectations. It never rewrites the corpus.
 
 ## Candidate recording sources
 
-Source review: 3 November 2026. These are acquisition leads, not admitted
-fixtures or reception results. No off-air audio or third-party transcript has
+Source review: 4 November 2026. These are development sources and acquisition
+leads, not labelled reception fixtures or acceptance results. No off-air audio or third-party transcript has
 been added to the repository. Page descriptions and WAV headers do not establish
 transmitted text, measured signal parameters, or full-file integrity.
 
 | Source | Evidence and intended use | Outstanding work |
 | --- | --- | --- |
 | [GRITTY demo](https://dxatlas.com/Gritty/Demo/) | Five complete off-air WAVs acquired into an external development cache, with original and 12/48 kHz derivative hashes in `testdata/manifests/gritty.json`. | Establish reviewed transcripts, exact signal settings, and redistribution terms. The page invites download and testing but supplies no explicit redistribution grant. |
+| [W6IWI RTTY audio](https://w6iwi.org/rtty/audio/) | Three complete HF test recordings and six converted WAVs acquired externally; hashes and source descriptions in `testdata/manifests/w6iwi.json`. | Align and independently review the source-described patterns, establish controls and timing, and resolve redistribution terms. Inspected recordings are development material. |
 | [LU3FZR TNC test set lead](https://www.qsl.net/l/lu3fzr/) | Operator reports 1993 clean 170 Hz recordings at 45, 50, 57, 75, 100, 110, 150, 200, and 300 baud, with companion text. Potential independent rate/framing fixtures. | Page retrieval failed, including HTTP 403; filenames, contents, framing, exact rates, and terms remain unverified. Check whether each text file is transmitted input or decoder output. Most listed rates are outside v0.1. |
-| [brainwagon](https://brainwagon.org/?s=rtty) | Operator reports roughly one minute of SDR-IQ contest audio near 14.090 MHz. Potential additional off-air source. | Page retrieval failed, including HTTP 403; the exact article, audio URL, transcript, format, and terms remain unverified. |
+| [brainwagon: The sights and sounds of RTTY](https://brainwagon.org/2011/07/02/the-sights-and-sounds-of-rtty/) | Audio-Digital's directory supplied this specific article URL on 4 November. Earlier lead described roughly one minute of SDR-IQ contest audio near 14.090 MHz. | Direct article retrieval still failed; audio URL, transcript, format, and terms remain unverified. The directory excerpt is not primary recording evidence. |
 | [Signal Identification Wiki RTTY samples](https://www.sigidwiki.com/wiki/RTTY) | Redirects to Radio Teletype (RTTY); 16 baud/shift examples plus overlapping-signal and contest MP3s. Three downloads and media formats verified below. | Transcripts, recording origin, measured signal parameters, and redistribution terms remain unverified. These are candidate fixtures, not labelled reception coverage. |
 | [F1ULT / MultiPSK RTTY](http://f1ult.free.fr/DIGIMODES/MULTIPSK/RTTY_en.htm) | Two MP3 examples labelled RTTY 45 and RTTY 50, with waterfall images and MultiPSK mode documentation. Both audio downloads verified below. | No transcript, recording provenance, or redistribution grant identified on the page. Its documented text mapping differs from the planned go-rtty profile. |
+| [benj500, Freesound RTTY.wav](https://freesound.org/people/benj500/sounds/369476/) | Primary page describes a DX394 HF recording and lists CC0, 15.007 s, stereo PCM16, 48 kHz. Found through [Audio-Digital](https://www.audio-digital.net/r-pages/rtty-audio-samples.html). | Original download requires login; not downloaded. No transcript or measured modem parameters. Page metadata is not file verification; any future stereo conversion needs an explicit channel policy. |
+| [RTTYOnline](https://rttyonline.com/) / [RTTY.COM](https://www.rtty.com/itty/index.htm) | Feed directories and a [KD2PEP custom-text WAV generator](https://unluckyfett.github.io/TTY-ART-GENERATOR/) provide sustained-stream and independent-transmitter leads. | No live stream capture or generator validation performed. Pin generator revision, text mapping, timing, and runtime before admitting generated fixtures. |
 | Operator captures via KiwiSDR/WebSDR or a local receiver | Can supply longer sessions, different transmitters, and selected channel conditions. | Preserve capture provenance, receiver settings, permission terms, and separately reviewed text. A receiver recording alone does not provide ground truth. |
 
 The GRITTY links and advertised conditions are:
@@ -157,12 +161,48 @@ output as a comparator would require explicit alphabet/control settings and a
 declared scoring view. These examples do not change the go-rtty codec contract
 or the existing fldigi/minimodem reference configuration.
 
+### W6IWI intake
+
+Complete downloads on 4 November 2026 verified mono PCM16 at **8,000 Hz**.
+The [manifest](../testdata/manifests/w6iwi.json) pins the original bytes, all six
+12/48 kHz derivatives, and the retrieved source-page hash. Audio remains in
+the external cache; it has not been added to the repository.
+
+| Recording | Original frames | Duration (s) | Provisional mark / space (Hz) |
+| --- | ---: | ---: | ---: |
+| `w6iwi-qbf-40m-20220315` | 12,545,280 | 1,568.160 | 2050 / 2220 |
+| `w6iwi-qbf-20m-20220614` | 18,604,800 | 2,325.600 | 2125 / 2295 |
+| `w6iwi-ry-170-20240415` | 4,525,056 | 565.632 | 2125 / 2295 |
+
+The source describes repeated Quick Brown Fox text for the first two files,
+and an RY pattern with a station prefix for the third. These descriptions do
+not specify exact control codes or sample-aligned expected text. Exploratory
+spectra and minimodem captures support the provisional tuning above. In
+particular, the 40 m signal is below the nominal 2125/2295 Hz pair. The fixed
+45.45-baud and 1.5-stop-bit comparator settings are not measurements of the
+mechanical transmitter's exact rate or framing.
+
+All three originals have an eight-byte RIFF length overstatement. Their
+`fmt ` and `data` chunks, declared sample counts, and complete PCM payloads
+were inspected. The manifest explicitly annotates this exception; the reader
+still rejects truncated PCM. Originals remain unchanged. Derived WAVs have
+standard headers and use the pinned resampler with fixed 0.5 gain, with no
+normalization, trimming, padding, or frequency correction.
+
+Full minimodem captures preserve text and raw codes separately from any future
+labels. NUL debug output, dropped characters, and shift errors in those captures
+must not become expected transmitted text. All three recording groups remain
+development-only with empty scoring ranges. The
+[workflow and validation record](REFERENCE.md#external-w6iwi-development-workflow)
+distinguish completed captures from unperformed checks.
+
 ## Admission and acquisition order
 
-The five GRITTY originals are acquired and assigned to development because they
-were inspected during harness bring-up. Next obtain reviewed labels and pursue
-LU3FZR plus independent amateur captures; reserve new recording groups for
-held-out evaluation before tuning. Preserve an entire original recording before
+The five GRITTY and three W6IWI originals are acquired and assigned to development
+because they were inspected during harness bring-up and intake. Next review and
+align W6IWI's test patterns, obtain GRITTY labels, and pursue independent amateur
+captures; reserve new recording groups for held-out evaluation before tuning.
+Preserve an entire original recording before
 making derived audio or excerpts. For each candidate:
 
 1. Record the source URL, retrieval date, recorder/transmitter provenance,

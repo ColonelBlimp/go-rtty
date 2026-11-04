@@ -12,26 +12,40 @@ import (
 )
 
 type corpusAudio struct {
-	Path        string `json:"path"`
-	URL         string `json:"url,omitempty"`
-	SHA256      string `json:"sha256"`
-	Bytes       int    `json:"bytes"`
-	SampleRate  int    `json:"sample_rate"`
-	SampleCount int    `json:"sample_count"`
+	Path                  string `json:"path"`
+	URL                   string `json:"url,omitempty"`
+	SHA256                string `json:"sha256"`
+	Bytes                 int    `json:"bytes"`
+	SampleRate            int    `json:"sample_rate"`
+	SampleCount           int    `json:"sample_count"`
+	RIFFSizeOverstatement int    `json:"riff_size_overstatement_bytes,omitempty"`
 }
 
 // Only the manifest is in the repository. This test neither fetches nor requires
 // external audio, a resampler, or a GUI; corpus:verify checks cached payloads.
 func TestExternalCorpusManifest(t *testing.T) {
+	for _, name := range []string{"gritty", "w6iwi"} {
+		t.Run(name, func(t *testing.T) { testExternalCorpusManifest(t, name) })
+	}
+}
+
+func testExternalCorpusManifest(t *testing.T, name string) {
+	t.Helper()
+	count, inputRate, host, sourcePage, riffOverstatement := 5, 6000, "dxatlas.com", "https://dxatlas.com/Gritty/Demo/", 0
+	if name == "w6iwi" {
+		count, inputRate, host, sourcePage, riffOverstatement = 3, 8000, "w6iwi.org", "https://w6iwi.org/rtty/audio/", 8
+	}
 	var m struct {
-		SchemaVersion        int    `json:"schema_version"`
-		Description          string `json:"description"`
-		SourcePage           string `json:"source_page"`
-		RetrievedUTCDate     string `json:"retrieved_utc_date"`
-		RedistributionStatus string `json:"redistribution_status"`
-		PartitionPolicy      string `json:"partition_policy"`
-		SettingsBasis        string `json:"settings_basis"`
-		Conversion           struct {
+		SchemaVersion         int    `json:"schema_version"`
+		Description           string `json:"description"`
+		SourcePage            string `json:"source_page"`
+		RetrievedUTCDate      string `json:"retrieved_utc_date"`
+		RedistributionStatus  string `json:"redistribution_status"`
+		PartitionPolicy       string `json:"partition_policy"`
+		SettingsBasis         string `json:"settings_basis"`
+		SourceSnapshotSHA256  string `json:"source_snapshot_sha256"`
+		OriginalContainerNote string `json:"original_container_note"`
+		Conversion            struct {
 			Tool                string         `json:"tool"`
 			LibrarySHA256       string         `json:"library_sha256"`
 			Settings            map[string]any `json:"settings"`
@@ -61,6 +75,8 @@ func TestExternalCorpusManifest(t *testing.T) {
 			RecordingGroup    string            `json:"recording_group"`
 			Partition         string            `json:"partition"`
 			LabelStatus       string            `json:"label_status"`
+			SourceDescription string            `json:"source_description"`
+			SourcePattern     string            `json:"source_pattern"`
 			ScoredRanges      []json.RawMessage `json:"scored_ranges"`
 			Original          corpusAudio       `json:"original"`
 			Derived           []corpusAudio     `json:"derived"`
@@ -72,8 +88,8 @@ func TestExternalCorpusManifest(t *testing.T) {
 			} `json:"reference_settings"`
 		} `json:"fixtures"`
 	}
-	load(t, "manifests/gritty.json", &m)
-	if m.SchemaVersion != 1 || len(m.Fixtures) != 5 || m.SourcePage != "https://dxatlas.com/Gritty/Demo/" ||
+	load(t, "manifests/"+name+".json", &m)
+	if m.SchemaVersion != 1 || len(m.Fixtures) != count || m.SourcePage != sourcePage ||
 		m.RetrievedUTCDate == "" || m.RedistributionStatus == "" || m.PartitionPolicy == "" || m.SettingsBasis == "" {
 		t.Fatal("incomplete corpus provenance")
 	}
@@ -90,6 +106,13 @@ func TestExternalCorpusManifest(t *testing.T) {
 		m.Conversion.BoundaryMapping == "" || m.Conversion.DelayPolicy == "" || m.Conversion.ClippingPolicy == "" {
 		t.Fatal("unpinned converter or missing timing/clipping policy")
 	}
+	wantConversion, err := json.Marshal(map[string]any{
+		"input_rate": inputRate, "output_rates": []int{12000, 48000}, "input_gain": 0.5,
+		"converter_type": 0, "end_of_input": 1, "channels": 1, "rounding": "src_float_to_short_array",
+	})
+	if err != nil || string(configuration) != string(wantConversion) {
+		t.Fatal("conversion recipe differs from the qualified adapter")
+	}
 	p := m.ReferenceProfile
 	if p.BaudNumerator != 909 || p.BaudDenominator != 20 || p.ShiftHz != 170 || p.DataBits != 5 || p.StartBits != 1 ||
 		p.Alphabet != "US" || p.AFC || p.Squelch || p.TXUSOS || p.BandwidthHz != 68 || p.FilterFactor != 1.25 ||
@@ -97,6 +120,9 @@ func TestExternalCorpusManifest(t *testing.T) {
 		t.Fatal("reference profile differs from the qualified replay adapter")
 	}
 	validHash := regexp.MustCompile(`^[0-9a-f]{64}$`)
+	if name == "w6iwi" && (!validHash.MatchString(m.SourceSnapshotSHA256) || m.OriginalContainerNote == "") {
+		t.Fatal("missing W6IWI source snapshot or container exception evidence")
+	}
 	validID := regexp.MustCompile(`^[a-z0-9_-]+$`)
 	seen := map[string]bool{}
 	groups := map[string]string{}
@@ -106,6 +132,9 @@ func TestExternalCorpusManifest(t *testing.T) {
 			t.Fatalf("invalid or duplicate identity: %s", f.ID)
 		}
 		seen[f.ID] = true
+		if name == "w6iwi" && (f.SourceDescription == "" || f.SourcePattern == "") {
+			t.Fatalf("%s: missing source-described provenance/pattern", f.ID)
+		}
 		if f.LabelStatus != "unlabelled" || len(f.ScoredRanges) != 0 || f.Partition != "development" {
 			t.Fatalf("%s: inspected unlabelled audio must not become scored/held-out evidence", f.ID)
 		}
@@ -114,8 +143,9 @@ func TestExternalCorpusManifest(t *testing.T) {
 		}
 		groups[f.RecordingGroup] = f.Partition
 		u, err := url.Parse(f.Original.URL)
-		if err != nil || u.Scheme != "https" || u.Host != "dxatlas.com" || path.Ext(u.Path) != ".wav" ||
-			f.Original.SampleRate != 6000 || f.Original.SampleCount <= 0 || len(f.Derived) != 2 {
+		if err != nil || u.Scheme != "https" || u.Host != host || path.Ext(u.Path) != ".wav" ||
+			f.Original.SampleRate != inputRate || f.Original.SampleCount <= 0 || len(f.Derived) != 2 ||
+			f.Original.RIFFSizeOverstatement != riffOverstatement {
 			t.Fatalf("invalid source format: %s", f.ID)
 		}
 		settings := f.ReferenceSettings
@@ -135,8 +165,9 @@ func TestExternalCorpusManifest(t *testing.T) {
 		}
 		for i, rate := range []int{12000, 48000} {
 			d := f.Derived[i]
+			wantCount := int64(f.Original.SampleCount) * int64(rate) / int64(inputRate)
 			if path.Dir(d.Path) != "prepared" || d.URL != "" || d.SampleRate != rate ||
-				d.SampleCount != f.Original.SampleCount*(rate/6000) || d.Bytes != 44+d.SampleCount*2 {
+				int64(d.SampleCount) != wantCount || d.Bytes != 44+d.SampleCount*2 || d.RIFFSizeOverstatement != 0 {
 				t.Fatalf("derived audio loses timing/format provenance: %s", d.Path)
 			}
 		}
