@@ -9,11 +9,14 @@ control of their audio devices and station operation.
 
 The project has its initial reference and development foundation: pinned
 external tools, independent protocol/audio fixtures, artifact validation tests,
-Task commands, and a Linux CI workflow. The modem, public `rtty` API, and
-encode/decode command-line tools are not implemented yet.
+Task commands, and a Linux CI workflow. The public [`rtty`](rtty/doc.go) package
+now provides configuration, audio-tone calculations, decoder option validation,
+and typed configuration/option errors. Text encoding, framing, PCM reception,
+AFSK generation, and encode/decode command-line tools remain unimplemented.
 
-The ordinary tests validate the retained evidence; they do not test a go-rtty
-modem. See the [reference recipe and validation record](docs/REFERENCE.md) and
+The ordinary tests validate configuration contracts and retained reference
+evidence; they do not test a go-rtty modem. See the
+[reference recipe and validation record](docs/REFERENCE.md) and
 [corpus inventory](docs/CORPUS.md) for what has actually been exercised and
 what remains unperformed.
 
@@ -26,8 +29,42 @@ Trusted aligned transcripts and held-out reception validation are outstanding.
 
 The [design document](docs/RTTY_DESIGN.md) specifies the proposed architecture,
 streaming contracts, receive and transmit processing, validation requirements,
-performance targets, and delivery stages. API examples and acceptance targets
-in that document describe planned behavior.
+performance targets, and delivery stages. Its implementation status identifies
+the available API subset; modem examples and acceptance targets describe
+planned behavior.
+
+## Configuration
+
+Start with explicit defaults, then set the caller's audio tuning and polarity:
+
+```go
+cfg := rtty.DefaultConfig()
+cfg.CenterHz = 2210
+cfg.Polarity = rtty.MarkLow
+markHz, spaceHz, err := cfg.ToneFrequencies() // 2125 Hz mark, 2295 Hz space
+if err != nil {
+    return err
+}
+fmt.Printf("mark %.0f Hz, space %.0f Hz\n", markHz, spaceHz)
+
+opts := rtty.DefaultDecoderOptions()
+opts.Squelch.Enabled = false // Explicitly request ungated reception.
+if err := opts.Validate(); err != nil {
+    return err
+}
+```
+
+Import `github.com/ColonelBlimp/go-rtty/rtty` (and `fmt` for the output above).
+`Config.Validate` and
+`ToneFrequencies` reject unsupported profiles and invalid enums with
+`ErrInvalidConfig` and `*ConfigError`. `DecoderOptions.Validate` returns
+`ErrInvalidOptions` and `*OptionsError`. Typed errors expose `Field` and `Reason`
+and support `errors.Is`/`errors.As`. See the [executable examples](rtty/example_test.go).
+
+Zero `Config`, `Polarity`, `StopBits`, and `Alphabet` values are invalid.
+Zero `DecoderOptions` explicitly disables USOS and squelch; the default options
+enable squelch with candidate thresholds awaiting receiver evaluation. These
+checks validate settings only; no decoder is created by this API subset.
 
 ## Planned capabilities
 

@@ -3,11 +3,13 @@
 
 # Provenance
 
-The repository currently contains development infrastructure and fixtures.
-No modem implementation or native DSP code has been copied or ported.
+The repository currently contains configuration/validation APIs, development
+infrastructure, and fixtures. No modem implementation or native DSP code has
+been copied or ported.
 
 | Material | Source and immutable identity | Treatment |
 | --- | --- | --- |
+| `rtty/config.go`, `rtty/options.go`, `rtty/errors.go` and accompanying GoDoc/tests | Original implementation of the project's configuration and validation contracts | GPL-3.0-only. No upstream implementation copied or ported. Alphabet identifiers name the intended profile; no alphabet mapping or modem DSP is introduced. Tests also read the existing independent fixture metadata for tone/profile expectations. |
 | `testdata/protocol/alphabet-us.csv` | fldigi 4.2.06, `src/rtty/rtty.cxx`, source archive SHA-256 `4360de225d6f8cfeb9bb6a5be6ac492e52702c8f704f87609c452d3bcb1b6c08` | US table transcribed into CSV; controls named explicitly; LSB-first bit strings added. Original notice retained in `testdata/protocol/NOTICE`. GPL-3.0-or-later. |
 | Protocol framing/text vectors | Project design and manually specified examples | Original GPL-3.0-only fixtures, independent of production code (none exists). Alphabet facts cross-checked against the pinned fldigi and minimodem sources. This is not a claim of external human review. |
 | `testdata/independent/*.wav` | Unmodified minimodem 0.24 Debian `0.24-1+b2` binary; exact executable hash in `testdata/manifests/tools.json` | Generated from original project text, no RF recording or channel impairment. Audio is original fixture material under GPL-3.0-only. Commands, timing, and captures are in the manifest. |

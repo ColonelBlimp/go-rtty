@@ -5,7 +5,8 @@
 
 The foundation uses minimodem 0.24 for independent audio and raw-code capture,
 and the **unmodified fldigi 4.2.06 application** for a second receiver check.
-There is no go-rtty modem yet. These checks establish a reproducible reference
+There is no go-rtty modem yet; the public package currently provides configuration
+and option validation. These external checks establish a reproducible reference
 workflow, not bidirectional interoperability with this library.
 
 ## Pinned tools
@@ -333,11 +334,32 @@ Commit review widened the manifest test's sample-count arithmetic to 64 bits
 to avoid overflow on 32-bit hosts. Ordinary and CGO-disabled Go suites passed
 again, as did the targeted manifest test with `GOARCH=386 CGO_ENABLED=0`.
 
+The subsequent Stage 2 configuration slice introduced `rtty.Config`, the
+profile enums, exact rational baud validation, tone calculation, decoder
+options, and typed configuration/option errors. Tests read the nine existing
+independent fixture configurations and their expected tones without decoding
+audio. They also cover equivalent large baud fractions, supported profile
+combinations, inclusive passband limits and neighboring rejected floats,
+invalid enums, non-finite frequencies/thresholds, zero/default option behavior,
+and wrapped `errors.Is`/`errors.As` access. Executable GoDoc examples pass.
+
+For this slice, `task check` passed ordinary and CGO-disabled Go suites, vet,
+race, and the offline Python suite with its optional resampler qualification
+explicitly skipped because `RTTY_SAMPLERATE` was not configured. The new `rtty`
+package passed on `GOARCH=386 CGO_ENABLED=0` and reported 100% statement coverage.
+Two 20-second fuzz runs, with two workers each, passed: configuration validation
+completed 3,686,278 executions and decoder option validation completed 3,688,046.
+The committed fuzz seeds also run as part of ordinary Go tests. These checks
+qualify validation behavior only. Text/framing vectors, PCM chunk invariance,
+receiver comparisons, and transmitter performance remain future implementation
+gates; no external audio replay was needed or claimed for this configuration change.
+
 Still unperformed: trusted labelled HF recordings and held-out reception
-comparisons, go-rtty protocol/DSP/streaming implementation and chunk invariance,
+comparisons, go-rtty text/framing/DSP/streaming implementation and chunk invariance,
 fldigi-generated TX fixtures, go-rtty bidirectional interoperability, transmit
 spectral qualification, false-output hours, and performance/resource gates.
-No native backend or public package is introduced by this foundation. Five
+The `rtty` package currently implements configuration and option validation;
+there is no native backend or modem implementation. Five
 GRITTY and three W6IWI originals have now been acquired in an external
 development cache;
 trusted labels, held-out recordings, and redistribution terms remain unresolved.

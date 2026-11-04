@@ -1,6 +1,6 @@
 # go-rtty Design
 
-- Status: proposed design for review.
+- Status: design contracts; configuration subset implemented.
 - Date: 2 November 2026.
 - Module: `github.com/ColonelBlimp/go-rtty`.
 - Public package: `github.com/ColonelBlimp/go-rtty/rtty`.
@@ -28,11 +28,13 @@ The APIs, thresholds, release stages, and performance numbers below are design
 contracts and proposed acceptance targets. They are not implementation or
 benchmark results.
 
-Implementation status (2 November 2026): the initial reference foundation now
-provides pinned tools, protocol/audio fixtures, artifact checks, Task commands,
-and a CI definition. The [reference validation record](REFERENCE.md) describes
-the checks actually run and the outstanding labelled-HF-corpus work. The
-public modem package and the API examples below remain unimplemented.
+Implementation status (4 November 2026): the reference foundation provides
+pinned tools, protocol/audio fixtures, external corpus workflows, artifact
+checks, Task commands, and a CI definition. The public `rtty` package implements
+configuration/enums, tone calculations, decoder option validation, and typed
+configuration/option errors. Text encoding, framing, receive DSP, and transmit
+generation remain unimplemented. The [validation record](REFERENCE.md) describes
+the checks actually run and the outstanding labelled-HF-corpus work.
 
 ## Relationship to go-ft8
 
@@ -262,9 +264,9 @@ the same outcome regardless of the wall-clock pace of calls.
 
 ## Public API
 
-The following sketches define the proposed surface and semantics. They are
-not compiled implementation files. Enum values and option validation will be
-documented in package GoDoc before the first release.
+The configuration and decoder option APIs below are implemented and documented
+in package GoDoc. Receiver, protocol encoding, and transmitter sketches define
+the proposed surface and semantics for later work; they are not implemented.
 
 ### Configuration
 
@@ -301,7 +303,14 @@ type SquelchOptions struct {
 }
 
 func DefaultDecoderOptions() DecoderOptions
+func (o DecoderOptions) Validate() error
 ```
+
+`Polarity`, `StopBits`, and `Alphabet` have underlying type `uint8`; zero and
+unknown values are invalid. The supported constants are `MarkHigh = 1`,
+`MarkLow = 2`, `StopBitsOnePointFive = 3`, `StopBitsTwo = 4`, and `AlphabetUS = 1`.
+Stop values count half-bits. No alphabet mapping or framing implementation is
+implied by these enum declarations.
 
 `DefaultConfig` supplies the version 0.1 values listed above, including 12 kHz
 PCM and 1.5 stop bits. Constructors require explicit valid configuration;
@@ -315,11 +324,15 @@ as an explicit ungated receive mode and test it separately from the recommended
 defaults; it is not shorthand for those defaults.
 
 Validate finite frequencies and thresholds, nonzero baud terms, the supported
-rate/shift/sample-rate combinations, and valid enums. Reduce rational baud
-values before comparing presets. Require each tone and the detector's guard
-bands to fit the input passband; the initial constraint leaves 300 Hz between
-each tone and DC/Nyquist. With squelch enabled, require
+rate/shift/sample-rate combinations, and valid enums. Compare reduced rational
+baud values without modifying the caller's config. Require each tone and the
+detector's guard bands to fit the input passband: both tones must lie in
+`[300, SampleRate/2 - 300]` Hz, including the endpoints. With squelch enabled, require
 `0 <= CloseDB < OpenDB <= 40` and `1 <= HangBits <= 100`.
+With squelch disabled, thresholds must still be finite, but their ranges and
+the hang interval are ignored. Both validation methods return the first invalid
+field and leave the supplied value unchanged. `ToneFrequencies` validates the
+complete config and returns zero frequencies on error.
 
 Initial squelch tuning candidates are 6 dB open, 3 dB close, and eight bits of
 hang time. These values describe tone energy relative to the detector's local
@@ -557,6 +570,13 @@ sleeps to maintain baud timing: sample positions determine timing, and the
 audio device determines playback pace.
 
 ### Errors
+
+The implemented configuration subset exports `ErrInvalidConfig` and
+`ErrInvalidOptions`. `*ConfigError` and `*OptionsError` expose `Field` (the Go
+field path, such as `Baud.Numerator` or `Squelch.OpenDB`) and `Reason`, and unwrap
+to the respective sentinel. Human-readable reason/error strings are not stable
+machine-readable identifiers. The remaining error categories below are planned
+for the operations that use them.
 
 Export sentinel errors for `ErrInvalidConfig`, `ErrInvalidOptions`,
 `ErrInvalidInput`, `ErrUnsupportedText`, `ErrQueueFull`, `ErrWouldBlock`,

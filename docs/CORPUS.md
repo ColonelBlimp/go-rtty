@@ -5,7 +5,9 @@
 
 This is a small **development fixture set**, not the release reception corpus.
 There is no go-rtty receiver or transmitter yet. Passing the ordinary tests
-establishes artifact integrity and consistency, not modem interoperability.
+establishes configuration contracts and artifact integrity/consistency, not
+modem interoperability. Configuration tests consume the independent audio
+manifest's explicit settings and expected tones; they do not process PCM.
 
 ## Checked-in evidence
 
