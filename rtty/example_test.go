@@ -43,3 +43,24 @@ func ExampleDecoderOptions_Validate() {
 	// <nil>
 	// USOS: true squelch: false
 }
+
+func ExampleEncodeText() {
+	encoded, err := rtty.EncodeText("a1a", rtty.TextOptions{Alphabet: rtty.AlphabetUS})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(encoded.Text)
+	fmt.Println(encoded.Codes)
+	// Output:
+	// A1A
+	// [31 3 27 23 31 3]
+}
+
+func ExampleEncodeText_unsupported() {
+	_, err := rtty.EncodeText("CQ “", rtty.TextOptions{Alphabet: rtty.AlphabetUS})
+	var detail *rtty.UnsupportedTextError
+	if errors.Is(err, rtty.ErrUnsupportedText) && errors.As(err, &detail) {
+		fmt.Printf("unsupported %U at byte %d\n", detail.Rune, detail.ByteOffset)
+	}
+	// Output: unsupported U+201C at byte 3
+}

@@ -1,9 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Marc L. Veary (7Q5MLV)
 // SPDX-License-Identifier: GPL-3.0-only
 
-// Package rtty provides configuration and validation for a streaming RTTY modem.
-// Text encoding, character framing, PCM reception, and AFSK generation are not
-// implemented yet.
+// Package rtty provides US teleprinter text encoding and configuration for a
+// streaming RTTY modem. Character framing, PCM reception, and AFSK generation
+// are not implemented yet.
+//
+// EncodeText converts valid UTF-8 text to five-bit codes with explicit
+// TextOptions{Alphabet: AlphabetUS}. It uppercases ASCII letters, preserves
+// supported controls, and rejects unsupported characters without partial output.
+// Each nonempty call begins an independent transmission with a letters shift.
 //
 // Start with DefaultConfig and DefaultDecoderOptions, then set the caller's
 // sample rate, tuning, and audio polarity. Config.Validate accepts the initial

@@ -5,8 +5,8 @@
 
 The foundation uses minimodem 0.24 for independent audio and raw-code capture,
 and the **unmodified fldigi 4.2.06 application** for a second receiver check.
-There is no go-rtty modem yet; the public package currently provides configuration
-and option validation. These external checks establish a reproducible reference
+There is no go-rtty modem yet; the public package currently provides finite text
+encoding, configuration, and option validation. These external checks establish a reproducible reference
 workflow, not bidirectional interoperability with this library.
 
 ## Pinned tools
@@ -350,15 +350,37 @@ package passed on `GOARCH=386 CGO_ENABLED=0` and reported 100% statement coverag
 Two 20-second fuzz runs, with two workers each, passed: configuration validation
 completed 3,686,278 executions and decoder option validation completed 3,688,046.
 The committed fuzz seeds also run as part of ordinary Go tests. These checks
-qualify validation behavior only. Text/framing vectors, PCM chunk invariance,
-receiver comparisons, and transmitter performance remain future implementation
-gates; no external audio replay was needed or claimed for this configuration change.
+qualify validation behavior only. At that point, text/framing vectors, PCM chunk
+invariance, receiver comparisons, and transmitter performance remained future
+implementation gates; no external audio replay was needed or claimed for the
+configuration change.
+
+The next Stage 2 slice implements finite US text encoding through `EncodeText`
+and `TextOptions`, with typed malformed-UTF-8 and unsupported-rune errors.
+Tests consume all eight existing valid text vectors, four unsupported-rune
+vectors, and all 60 representable letters/figures table entries. The protocol
+fixtures and their manifest hashes are unchanged. Additional cases cover
+shift/control boundaries, repeated SPACE, validation precedence, error byte
+offsets, empty results on failure, concurrent independent calls, and caller-owned
+code storage. A test-only interpreter reads the fixed CSV independently of the
+production tables and checks encoded text under both receive USOS policies;
+this is a protocol check, not a receiver implementation or interoperability test.
+
+For the text slice, `task check` passed ordinary and CGO-disabled Go suites, vet,
+race, and the offline Python suite. Its optional resampler qualification was
+explicitly skipped because `RTTY_SAMPLERATE` was not configured. The `rtty`
+package also passed with `GOARCH=386 CGO_ENABLED=0` and reported 100% statement
+coverage. Encoder fuzzing with two workers passed a 30-second run of 182,498
+executions and a separate 100,000-execution run with minimization limited to
+100 ms. Fuzz seeds and executable GoDoc examples pass in the ordinary suite.
+This change adds no framing, PCM processing, or streaming state, so external
+audio replay and PCM chunk-invariance checks were not performed.
 
 Still unperformed: trusted labelled HF recordings and held-out reception
-comparisons, go-rtty text/framing/DSP/streaming implementation and chunk invariance,
+comparisons, go-rtty framing/DSP/streaming implementation and chunk invariance,
 fldigi-generated TX fixtures, go-rtty bidirectional interoperability, transmit
 spectral qualification, false-output hours, and performance/resource gates.
-The `rtty` package currently implements configuration and option validation;
+The `rtty` package implements finite text encoding, configuration, and option validation;
 there is no native backend or modem implementation. Five
 GRITTY and three W6IWI originals have now been acquired in an external
 development cache;

@@ -1,6 +1,6 @@
 # go-rtty Design
 
-- Status: design contracts; configuration subset implemented.
+- Status: design contracts; configuration and finite text encoding implemented.
 - Date: 2 November 2026.
 - Module: `github.com/ColonelBlimp/go-rtty`.
 - Public package: `github.com/ColonelBlimp/go-rtty/rtty`.
@@ -31,9 +31,9 @@ benchmark results.
 Implementation status (4 November 2026): the reference foundation provides
 pinned tools, protocol/audio fixtures, external corpus workflows, artifact
 checks, Task commands, and a CI definition. The public `rtty` package implements
-configuration/enums, tone calculations, decoder option validation, and typed
-configuration/option errors. Text encoding, framing, receive DSP, and transmit
-generation remain unimplemented. The [validation record](REFERENCE.md) describes
+configuration/enums, tone calculations, option validation, finite US text
+encoding, and typed configuration/option/input/text errors. Framing, receive
+DSP, and transmit generation remain unimplemented. The [validation record](REFERENCE.md) describes
 the checks actually run and the outstanding labelled-HF-corpus work.
 
 ## Relationship to go-ft8
@@ -264,9 +264,9 @@ the same outcome regardless of the wall-clock pace of calls.
 
 ## Public API
 
-The configuration and decoder option APIs below are implemented and documented
-in package GoDoc. Receiver, protocol encoding, and transmitter sketches define
-the proposed surface and semantics for later work; they are not implemented.
+The configuration, option validation, and finite text encoding APIs below are
+implemented and documented in package GoDoc. Receiver, frame-symbol, and
+transmitter sketches define the proposed surface and semantics for later work.
 
 ### Configuration
 
@@ -309,8 +309,8 @@ func (o DecoderOptions) Validate() error
 `Polarity`, `StopBits`, and `Alphabet` have underlying type `uint8`; zero and
 unknown values are invalid. The supported constants are `MarkHigh = 1`,
 `MarkLow = 2`, `StopBitsOnePointFive = 3`, `StopBitsTwo = 4`, and `AlphabetUS = 1`.
-Stop values count half-bits. No alphabet mapping or framing implementation is
-implied by these enum declarations.
+Stop values count half-bits. The US mapping is implemented by the text encoder;
+framing remains planned.
 
 `DefaultConfig` supplies the version 0.1 values listed above, including 12 kHz
 PCM and 1.5 stop bits. Constructors require explicit valid configuration;
@@ -485,6 +485,7 @@ type Symbol struct {
 }
 
 func EncodeText(text string, opts TextOptions) (EncodedText, error)
+func (o TextOptions) Validate() error
 func FrameCodes(codes []uint8, stop StopBits) ([]Symbol, error)
 ```
 
@@ -493,6 +494,20 @@ with LTRS and includes all required shifts, including the FIGS repetition
 after SPACE. `EncodedText.Text` is the normalized source text; `Codes` is the
 actual transmitted sequence, including shifts. Empty input returns empty
 output. Validation of the entire input precedes output commitment.
+
+`TextOptions` requires explicit `AlphabetUS`; zero options are invalid, including
+for empty input. Options are checked first, then the complete input's UTF-8
+validity, then representability in the selected alphabet. Malformed UTF-8
+returns `*InvalidUTF8Error` at the first invalid byte, even when an earlier
+valid rune is unsupported. Otherwise the first unsupported rune returns
+`*UnsupportedTextError` with the original rune and byte offset. A correctly
+encoded U+FFFD is unsupported text rather than malformed UTF-8. Literal ASCII
+ESC and US do not request FIGS/LTRS and are rejected as unsupported text.
+
+The result is caller-owned. Empty input and all errors return the zero
+`EncodedText`, including nil `Codes`; errors never expose a partial encoding.
+No state is shared between calls. `EncodeText` and `TextOptions.Validate` are
+implemented; `Symbol` and `FrameCodes` remain the next protocol milestone.
 
 `FrameCodes` rejects values above 31 and invalid stop selections. It adds
 framing to the supplied codes without inserting shifts, lead-in, or tail.
@@ -571,12 +586,14 @@ audio device determines playback pace.
 
 ### Errors
 
-The implemented configuration subset exports `ErrInvalidConfig` and
-`ErrInvalidOptions`. `*ConfigError` and `*OptionsError` expose `Field` (the Go
+The implemented APIs export `ErrInvalidConfig`, `ErrInvalidOptions`,
+`ErrInvalidInput`, and `ErrUnsupportedText`. `*ConfigError` and `*OptionsError` expose `Field` (the Go
 field path, such as `Baud.Numerator` or `Squelch.OpenDB`) and `Reason`, and unwrap
 to the respective sentinel. Human-readable reason/error strings are not stable
-machine-readable identifiers. The remaining error categories below are planned
-for the operations that use them.
+machine-readable identifiers. `*InvalidUTF8Error` exposes `ByteOffset` and
+unwraps to `ErrInvalidInput`. `*UnsupportedTextError` exposes `Rune` and
+`ByteOffset` and unwraps to `ErrUnsupportedText`. The remaining error categories
+below are planned for the operations that use them.
 
 Export sentinel errors for `ErrInvalidConfig`, `ErrInvalidOptions`,
 `ErrInvalidInput`, `ErrUnsupportedText`, `ErrQueueFull`, `ErrWouldBlock`,

@@ -5,15 +5,16 @@
 
 This is a small **development fixture set**, not the release reception corpus.
 There is no go-rtty receiver or transmitter yet. Passing the ordinary tests
-establishes configuration contracts and artifact integrity/consistency, not
-modem interoperability. Configuration tests consume the independent audio
-manifest's explicit settings and expected tones; they do not process PCM.
+establishes finite text encoding, configuration contracts, and artifact
+integrity/consistency, not modem interoperability. Encoder tests consume the
+fixed text and alphabet vectors; configuration tests consume the independent
+audio manifest's explicit settings and expected tones. Neither processes PCM.
 
 ## Checked-in evidence
 
 | Group | Contents | Evidence |
 | --- | --- | --- |
-| Protocol | All 32 US alphabet codes in letters/figures, explicit LSB-first bits; eight literal half-bit frame examples; eight text and four unsupported-rune examples | Independently specified before implementation and checked against pinned source tables. Future codec tests must consume these fixed expectations. |
+| Protocol | All 32 US alphabet codes in letters/figures, explicit LSB-first bits; eight literal half-bit frame examples; eight text and four unsupported-rune examples | Specified before implementation and checked against pinned source tables. Encoder tests now consume the unchanged alphabet/text expectations; framing implementation remains pending. |
 | Clean audio | Eight minimodem transmissions: 12/48 kHz × mark-high/mark-low × 1.5/2 stop bits | WAV checksums, complete raw-code and exact text captures; 17 frames each, including shifts and CR/LF. |
 | USOS probe | `A1 A`, six frames, 12 kHz, mark-high, 1.5 stops | The transmitted codes are `[31,3,27,23,4,3]`. Expected text is `A1 A` with receive USOS on and `A1 -` with it off. |
 | Second receiver | All nine WAVs replayed in unmodified fldigi, with both USOS policies | 18 exact widget-text comparisons; full captured output and configuration hashes in `testdata/reference/fldigi-results.json`. CRLF is displayed as LF. |
@@ -28,6 +29,10 @@ fixtures avoid those behaviors; the protocol vectors preserve the library's
 strict intended contract.
 
 ## Manifests and scoring
+
+The protocol fixture descriptions record their pre-implementation origin. Their
+bytes and hashes remain unchanged when the encoder is introduced; production
+output is checked against them rather than used to regenerate expectations.
 
 `testdata/manifests/tools.json` pins reference source archives, binary packages,
 executables, and the isolated Linux runtime packages used for reproduction.

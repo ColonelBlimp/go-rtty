@@ -3,15 +3,18 @@
 
 # Provenance
 
-The repository currently contains configuration/validation APIs, development
-infrastructure, and fixtures. No modem implementation or native DSP code has
-been copied or ported.
+The repository currently contains configuration/validation APIs, finite text
+encoding, development infrastructure, and fixtures. The US mapping tables are
+adapted from the source identified below. No receive or transmit DSP has been
+copied or ported.
 
 | Material | Source and immutable identity | Treatment |
 | --- | --- | --- |
-| `rtty/config.go`, `rtty/options.go`, `rtty/errors.go` and accompanying GoDoc/tests | Original implementation of the project's configuration and validation contracts | GPL-3.0-only. No upstream implementation copied or ported. Alphabet identifiers name the intended profile; no alphabet mapping or modem DSP is introduced. Tests also read the existing independent fixture metadata for tone/profile expectations. |
+| `rtty/config.go`, `rtty/options.go`, `rtty/errors.go` and accompanying GoDoc/tests | Original implementation of the project's configuration and validation contracts | GPL-3.0-only. No upstream implementation copied or ported. These files define profile identifiers and validation, without alphabet tables or modem DSP. Tests also read the existing independent fixture metadata for tone/profile expectations. |
+| `rtty/alphabet.go` | fldigi 4.2.06, `src/rtty/rtty.cxx`, via the pinned `testdata/protocol/alphabet-us.csv`; source archive SHA-256 `4360de225d6f8cfeb9bb6a5be6ac492e52702c8f704f87609c452d3bcb1b6c08` | Tables adapted to immutable Go string constants. Named controls become ASCII bytes; FIGS/LTRS use non-text placeholders. Original copyright and GPL-3.0-or-later notice retained in [rtty/NOTICE.alphabet](../rtty/NOTICE.alphabet); the adapted file is distributed under GPL version 3, with original additions GPL-3.0-only. This is source-derived table data. |
+| `rtty/encode.go` and encoder/input error implementations and tests | Original implementation of the project's strict text/shift contract, checked against the pre-existing literal text vectors and CSV | GPL-3.0-only. No upstream encoder logic copied. Tests interpret the fixed CSV independently of production tables, with both USOS policies, in addition to exact golden code comparisons. |
 | `testdata/protocol/alphabet-us.csv` | fldigi 4.2.06, `src/rtty/rtty.cxx`, source archive SHA-256 `4360de225d6f8cfeb9bb6a5be6ac492e52702c8f704f87609c452d3bcb1b6c08` | US table transcribed into CSV; controls named explicitly; LSB-first bit strings added. Original notice retained in `testdata/protocol/NOTICE`. GPL-3.0-or-later. |
-| Protocol framing/text vectors | Project design and manually specified examples | Original GPL-3.0-only fixtures, independent of production code (none exists). Alphabet facts cross-checked against the pinned fldigi and minimodem sources. This is not a claim of external human review. |
+| Protocol framing/text vectors | Project design and manually specified examples | Original GPL-3.0-only fixtures, specified before production encoding code. Alphabet facts cross-checked against the pinned fldigi and minimodem sources. This is not a claim of external human review. |
 | `testdata/independent/*.wav` | Unmodified minimodem 0.24 Debian `0.24-1+b2` binary; exact executable hash in `testdata/manifests/tools.json` | Generated from original project text, no RF recording or channel impairment. Audio is original fixture material under GPL-3.0-only. Commands, timing, and captures are in the manifest. |
 | Minimodem behavior comparison | Upstream [release commit `17e17b784ea83e97e84dacb813ccec25072dbd1d`](https://github.com/kamalmostafa/minimodem/tree/17e17b784ea83e97e84dacb813ccec25072dbd1d), 0.24 source archive SHA-256 `f8cca4db8e3f284d67f843054d6bb4d88a3db5e77b26192410e41e9a06f4378e` | External executable/source inspection only. Copyright 2011–2016 Kamal Mostafa; GPL-3.0-or-later. Its encoder/decoder are not copied into Go. |
 | Fldigi behavior comparison | Unmodified Debian `4.2.06-1+deb13u1` binary; upstream archive and binary/package hashes in `testdata/manifests/tools.json` | External application comparison, not an extracted modem core. Source archive is upstream 4.2.06; the Debian binary additionally includes its distribution changes. |

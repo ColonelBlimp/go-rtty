@@ -16,7 +16,7 @@ tasks:
       - task --list
 
   test:
-    desc: Run the ordinary Go suite (configuration contracts and reference artifacts).
+    desc: Run the ordinary Go suite (text encoding, configuration, and reference artifacts).
     cmds:
       - go test ./...
 
@@ -28,12 +28,12 @@ tasks:
       - go test ./...
 
   test:smoke:
-    desc: Run the small, offline configuration and foundation suite.
+    desc: Run the small, offline protocol and foundation suite.
     cmds:
       - task: test
 
   test:smoke-purego:
-    desc: Run the offline configuration and foundation suite with CGO disabled.
+    desc: Run the offline protocol and foundation suite with CGO disabled.
     cmds:
       - task: test:purego
 
@@ -108,7 +108,7 @@ tasks:
       - python3 -B -m unittest discover -s scripts -p '*_test.py'
 
   check:
-    desc: Run local configuration and foundation checks; this is not a modem release gate.
+    desc: Run local protocol and foundation checks; this is not a modem release gate.
     cmds:
       - task: version:check
       - task: test

@@ -10,11 +10,11 @@ control of their audio devices and station operation.
 The project has its initial reference and development foundation: pinned
 external tools, independent protocol/audio fixtures, artifact validation tests,
 Task commands, and a Linux CI workflow. The public [`rtty`](rtty/doc.go) package
-now provides configuration, audio-tone calculations, decoder option validation,
-and typed configuration/option errors. Text encoding, framing, PCM reception,
-AFSK generation, and encode/decode command-line tools remain unimplemented.
+now provides US teleprinter text encoding, configuration, audio-tone calculations,
+option validation, and typed errors. Framing, PCM reception, AFSK generation,
+and encode/decode command-line tools remain unimplemented.
 
-The ordinary tests validate configuration contracts and retained reference
+The ordinary tests validate text encoding, configuration contracts, and retained reference
 evidence; they do not test a go-rtty modem. See the
 [reference recipe and validation record](docs/REFERENCE.md) and
 [corpus inventory](docs/CORPUS.md) for what has actually been exercised and
@@ -66,12 +66,39 @@ Zero `DecoderOptions` explicitly disables USOS and squelch; the default options
 enable squelch with candidate thresholds awaiting receiver evaluation. These
 checks validate settings only; no decoder is created by this API subset.
 
+## Text encoding
+
+Encode a complete message with an explicit alphabet:
+
+```go
+encoded, err := rtty.EncodeText("a1a", rtty.TextOptions{Alphabet: rtty.AlphabetUS})
+if err != nil {
+    return err
+}
+fmt.Println(encoded.Text)  // A1A
+fmt.Println(encoded.Codes) // [31 3 27 23 31 3]
+```
+
+The result includes the initial LTRS and all required letters/figures shifts.
+SPACE preserves the transmitter's shift state and forces another FIGS before
+the next figures character, for receivers with either USOS policy. CR, LF,
+NUL, and BEL are preserved exactly; there is no line-ending conversion or
+replacement of unsupported characters. ASCII lowercase becomes uppercase.
+
+Invalid options return `ErrInvalidOptions` first. Malformed UTF-8 returns
+`ErrInvalidInput` with `*InvalidUTF8Error`; otherwise an unsupported rune
+returns `ErrUnsupportedText` with `*UnsupportedTextError`. Both text error
+types expose the original byte offset, and the latter also exposes the rune.
+Every error returns an empty result. Empty valid input emits no codes.
+
+Each call is independent and produces caller-owned code storage. There is no
+sample timing, framing, audio output, or streaming queue in this API yet.
+
 ## Planned capabilities
 
 - Decode a selected RTTY signal from continuous mono PCM chunks into character
   and control observations, text, and reception diagnostics.
-- Encode text into five-bit codes, letters/figures shifts, and timed mark/space
-  symbols.
+- Frame five-bit codes as timed mark/space symbols.
 - Generate AFSK audio through caller-supplied buffers, supporting both complete
   messages and interactive text with a bounded queue.
 - Preserve filter, timing, and shift state across receive chunks, and preserve
