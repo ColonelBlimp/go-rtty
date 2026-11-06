@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "generator": "receiver-selective-v1",
+  "partition": "development",
+  "description": "Symbol-conditioned amplitude derivatives of independent minimodem WAVs, not a frequency-selective convolution or held-out HF channel. Full-file code/text scoring without trimming.",
+  "signal_gain": 0.0625,
+  "amplitude_time_constant_seconds": 0.0005,
+  "snr_reference_bandwidth_hz": 2500,
+  "noise_seeds": [7, 23, 101],
+  "energy_peak_release_bits": 16,
+  "normalization_floor_fraction": 0.0625,
+  "candidates": ["ratio", "bounded-normalization", "envelope-offset"],
+  "cases": [
+    {"id": "control"},
+    {"id": "mark-minus6", "mark_db": 6},
+    {"id": "space-minus6", "space_db": 6},
+    {"id": "mark-minus12", "mark_db": 12},
+    {"id": "space-minus12", "space_db": 12},
+    {"id": "mark-minus20", "mark_db": 20},
+    {"id": "space-minus20", "space_db": 20},
+    {"id": "mark-fade20", "mark_db": 20, "fade": true},
+    {"id": "space-fade20", "space_db": 20, "fade": true},
+    {"id": "mark-minus12-noise10", "mark_db": 12, "snr_db": 10},
+    {"id": "space-minus12-noise10", "space_db": 12, "snr_db": 10}
+  ]
+}

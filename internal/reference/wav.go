@@ -8,6 +8,27 @@ import (
 	"fmt"
 )
 
+// DecodeWAV validates a fixture WAV before allocating caller-owned PCM. It is
+// used by the internal receiver experiment, not the public modem API.
+func DecodeWAV(b []byte) (rate int, pcm []int16, err error) {
+	rate, samples, err := inspectWAV(b)
+	if err != nil {
+		return 0, nil, err
+	}
+	for pos := 12; pos < len(b); {
+		n := int(binary.LittleEndian.Uint32(b[pos+4 : pos+8]))
+		if string(b[pos:pos+4]) == "data" {
+			pcm = make([]int16, samples)
+			for i := range pcm {
+				pcm[i] = int16(binary.LittleEndian.Uint16(b[pos+8+2*i:]))
+			}
+			return rate, pcm, nil
+		}
+		pos += 8 + n + n%2
+	}
+	panic("validated WAV has no data")
+}
+
 // inspectWAV accepts the deliberately narrow fixture format: RIFF/WAVE, mono,
 // PCM16, 12 or 48 kHz. It inspects bounded input without allocating PCM storage.
 func inspectWAV(b []byte) (rate, samples int, err error) {

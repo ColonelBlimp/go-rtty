@@ -16,7 +16,7 @@ tasks:
       - task --list
 
   test:
-    desc: Run the ordinary Go suite (text encoding, configuration, and reference artifacts).
+    desc: Run the Go suite (protocol, receiver experiment, and reference artifacts).
     cmds:
       - go test ./...
 
@@ -106,6 +106,46 @@ tasks:
     desc: Offline corpus-tool tests; resampler qualification runs only when configured.
     cmds:
       - python3 -B -m unittest discover -s scripts -p '*_test.py'
+
+  receiver:baseline:
+    desc: Report the internal receiver's checked-in independent clean-fixture results.
+    cmds:
+      - go test ./internal/receiver -run '^TestIndependentBaseline$' -v -count=1
+
+  receiver:impairments:
+    desc: Reproduce the current receiver's development impairment study and regression comparison.
+    cmds:
+      - go test ./internal/receiver -run '^TestChannelStudy$' -v -count=1
+
+  receiver:impairments:legacy:
+    desc: Reproduce the original rectangular receiver's retained development baseline.
+    cmds:
+      - go test ./internal/receiver -run '^TestChannelStudy$' -v -count=1 -args -receiver-study-legacy
+
+  receiver:selective:
+    desc: Reproduce the test-only unequal-tone threshold comparison, including regressions.
+    cmds:
+      - go test ./internal/receiver -run '^TestSelectiveStudy$' -v -count=1
+
+  receiver:noise:
+    desc: Reproduce guarded-envelope and short-evidence development comparisons.
+    cmds:
+      - go test ./internal/receiver -run '^TestNoise(AwareStudy|ShortEvidenceStudy)$' -v -count=1
+
+  bench:noise:
+    desc: Benchmark noise-aware test prototypes including shared replay overhead.
+    cmds:
+      - go test ./internal/receiver -run '^$' -bench '^BenchmarkNoise(AwareCandidates|ShortEvidence)$' -benchmem
+
+  bench:thresholds:
+    desc: Benchmark threshold candidates including the shared experimental replay harness.
+    cmds:
+      - go test ./internal/receiver -run '^$' -bench '^BenchmarkThresholdCandidates$' -benchmem
+
+  bench:receiver:
+    desc: Benchmark the experimental receiver on clean audio with 20 ms chunks.
+    cmds:
+      - go test ./internal/receiver -run '^$' -bench '^BenchmarkReceiver$' -benchmem -count=3
 
   check:
     desc: Run local protocol and foundation checks; this is not a modem release gate.

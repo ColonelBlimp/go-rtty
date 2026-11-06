@@ -10,12 +10,31 @@ control of their audio devices and station operation.
 The project has its initial reference and development foundation: pinned
 external tools, independent protocol/audio fixtures, artifact validation tests,
 Task commands, and a Linux CI workflow. The public [`rtty`](rtty/doc.go) package
-now provides US teleprinter text encoding, configuration, audio-tone calculations,
-option validation, and typed errors. Framing, PCM reception, AFSK generation,
-and encode/decode command-line tools remain unimplemented.
+now provides US teleprinter text encoding, protocol framing, configuration,
+audio-tone calculations, option validation, and typed errors. PCM reception,
+AFSK generation, and encode/decode command-line tools remain unimplemented in
+the public API. An [internal receiver experiment](docs/RECEIVER_BASELINE.md)
+now decodes the nine independent clean WAV fixtures with zero code/text errors
+and passes PCM chunk-invariance checks. HF reception remains unqualified.
+The [controlled impairment study](docs/RECEIVER_IMPAIRMENTS.md) records tuning
+and clock tolerance on these short files, plus noise, gain-step, and dropout
+failures. It provides a reproducible development baseline rather than a
+reception acceptance result.
+The [gain-step timing update](docs/RECEIVER_GAIN_STEPS.md) now recovers the
+observed common-step losses with no per-run code/text regression across that
+study. Noise and undeclared-dropout failures remain open.
+The [unequal-tone threshold comparison](docs/RECEIVER_SELECTIVE.md) now records
+large gains from two experimental envelope corrections, alongside regressions
+on the existing noise/gain-step cases. Both candidates remain test-only; the
+current receiver is unchanged.
+The later [guarded-envelope follow-up](docs/RECEIVER_NOISE_AWARE.md) reduces
+controlled unequal-tone code errors from 1204 to 12 while preserving all 324
+prior code/text results. It remains test-only pending physical-channel, wider
+tuning, and labelled-HF validation.
 
-The ordinary tests validate text encoding, configuration contracts, and retained reference
-evidence; they do not test a go-rtty modem. See the
+The ordinary tests validate text encoding, framing, configuration contracts,
+the experimental receiver on clean/impaired development audio, and retained
+reference evidence. See the
 [reference recipe and validation record](docs/REFERENCE.md) and
 [corpus inventory](docs/CORPUS.md) for what has actually been exercised and
 what remains unperformed.
@@ -91,14 +110,33 @@ returns `ErrUnsupportedText` with `*UnsupportedTextError`. Both text error
 types expose the original byte offset, and the latter also exposes the rune.
 Every error returns an empty result. Empty valid input emits no codes.
 
-Each call is independent and produces caller-owned code storage. There is no
-sample timing, framing, audio output, or streaming queue in this API yet.
+Each call is independent and produces caller-owned code storage. `EncodeText`
+does not add framing. Sample timing, audio output, and streaming queues remain
+unimplemented.
+
+Frame codes separately into logical mark/space symbols:
+
+```go
+symbols, err := rtty.FrameCodes(encoded.Codes, rtty.StopBitsOnePointFive)
+if err != nil {
+    return err
+}
+fmt.Println(len(symbols)) // 42: seven symbols per code
+```
+
+Each frame contains a space start, five LSB-first data bits, and a mark stop.
+Start and data symbols last two half-bits; stop lasts three or four for 1.5 or
+2 stop bits. Adjacent equal states remain separate. Framing adds no shifts,
+lead-in, or tail, and is independent of audio polarity and sample timing.
+Invalid stop selections return `ErrInvalidOptions` with `*OptionsError` before
+codes are inspected. The first value above 31 returns `ErrInvalidInput` with
+`*InvalidCodeError`, exposing `CodeIndex` and `Code`. Errors and empty valid
+input return nil symbols. Successful output belongs to the caller.
 
 ## Planned capabilities
 
 - Decode a selected RTTY signal from continuous mono PCM chunks into character
   and control observations, text, and reception diagnostics.
-- Frame five-bit codes as timed mark/space symbols.
 - Generate AFSK audio through caller-supplied buffers, supporting both complete
   messages and interactive text with a bounded queue.
 - Preserve filter, timing, and shift state across receive chunks, and preserve
@@ -159,8 +197,8 @@ treated as sufficient evidence of correctness.
 ## Development
 
 The module path is `github.com/ColonelBlimp/go-rtty`, and `go.mod` currently
-targets Go 1.26. The planned public package is
-`github.com/ColonelBlimp/go-rtty/rtty`; it is not available in this checkout yet.
+targets Go 1.26. The public package is
+`github.com/ColonelBlimp/go-rtty/rtty`; its implemented subset is described above.
 
 Development will proceed through these stages:
 
@@ -179,6 +217,14 @@ go test ./...
 CGO_ENABLED=0 go test ./...
 task check                 # version, Go/Python tests, vet, race
 task corpus:check          # offline Python tooling checks; optional resampler qualification
+task receiver:baseline     # internal receiver results on independent clean WAVs
+task receiver:impairments  # reproducible development errors and chunk invariance
+task receiver:impairments:legacy # reproduce the original receiver comparison
+task receiver:selective    # unequal-tone candidates and existing-case regressions
+task receiver:noise        # guarded envelope estimates and half-bit evidence
+task bench:receiver        # clean receiver benchmark with 20 ms chunks
+task bench:thresholds      # test-only threshold candidates with replay overhead
+task bench:noise           # guarded-envelope prototype costs
 task --list                # implemented tasks only
 task version:get
 ```
@@ -190,7 +236,7 @@ need the pinned executables and Python; see [REFERENCE.md](docs/REFERENCE.md).
 No task loads environment files or downloads tools implicitly.
 
 `version.txt` is an unreleased development identifier. Tagging, remote
-publication, receiver corpus gates, and benchmark tasks remain future work.
+publication, receiver corpus gates, and broader benchmark tasks remain future work.
 Other task names in the design remain proposals until implemented.
 
 Read [AGENTS.md](AGENTS.md) for repository instructions and the

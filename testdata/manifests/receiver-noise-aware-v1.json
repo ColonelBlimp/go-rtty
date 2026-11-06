@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "partition": "development",
+  "candidates": ["guarded-offset", "guarded-normalization"],
+  "guard_distance_from_nearest_tone_hz": 340,
+  "noise_smoothing_bits": 2,
+  "minimum_noise_energy": 1e-8,
+  "peak_release_bits": 16,
+  "branch_to_noise_ratio": 4,
+  "dominance_energy_ratio": 2,
+  "qualification_bits": 0.25,
+  "evidence_max_age_bits": 16,
+  "engage_power_ratio": 4,
+  "disengage_power_ratio": 2,
+  "normalization_floor_fraction": 0.0625,
+  "description": "Frozen test-only guard-band and evidence-gating candidates on unchanged development inputs. Guard estimates include rectangular-filter leakage; no calibrated squelch or held-out/HF claim."
+}

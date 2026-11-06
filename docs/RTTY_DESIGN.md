@@ -1,6 +1,6 @@
 # go-rtty Design
 
-- Status: design contracts; configuration and finite text encoding implemented.
+- Status: design contracts; configuration, finite text encoding, and framing implemented.
 - Date: 2 November 2026.
 - Module: `github.com/ColonelBlimp/go-rtty`.
 - Public package: `github.com/ColonelBlimp/go-rtty/rtty`.
@@ -28,12 +28,28 @@ The APIs, thresholds, release stages, and performance numbers below are design
 contracts and proposed acceptance targets. They are not implementation or
 benchmark results.
 
-Implementation status (4 November 2026): the reference foundation provides
+Implementation status (6 November 2026): the reference foundation provides
 pinned tools, protocol/audio fixtures, external corpus workflows, artifact
 checks, Task commands, and a CI definition. The public `rtty` package implements
 configuration/enums, tone calculations, option validation, finite US text
-encoding, and typed configuration/option/input/text errors. Framing, receive
-DSP, and transmit generation remain unimplemented. The [validation record](REFERENCE.md) describes
+encoding, canonical frame symbols, and typed configuration/option/input/text
+errors. An internal Go receiver experiment now decodes the independent clean
+WAVs with chunk-invariant state; see its [baseline report](RECEIVER_BASELINE.md).
+Its [controlled impairment study](RECEIVER_IMPAIRMENTS.md) now records short
+development tuning/clock/noise/gain-step/dropout results, including failures.
+The subsequent [gain-step timing experiment](RECEIVER_GAIN_STEPS.md) removes
+the observed common-step losses with a conditional short timing path while
+preserving the original data integrator and framing tolerances.
+A subsequent [unequal-tone comparison](RECEIVER_SELECTIVE.md) evaluates two
+test-only envelope corrections. Both improve the controlled amplitude model
+but regress on the earlier matrix, so the current ratio receiver is unchanged.
+A [guarded-envelope follow-up](RECEIVER_NOISE_AWARE.md) adds test-only noise
+guards and qualified half-bit evidence. It reduces the controlled unequal-tone
+losses to 12 code edits with no per-run code/text regression across the prior
+matrix. Physical-channel, broad tuning, and scored HF gates still precede
+adoption; the current receiver remains unchanged.
+The public receiver and transmit generation remain unimplemented, and stage 3's
+labelled HF comparison remains open. The [validation record](REFERENCE.md) describes
 the checks actually run and the outstanding labelled-HF-corpus work.
 
 ## Relationship to go-ft8
@@ -264,9 +280,10 @@ the same outcome regardless of the wall-clock pace of calls.
 
 ## Public API
 
-The configuration, option validation, and finite text encoding APIs below are
-implemented and documented in package GoDoc. Receiver, frame-symbol, and
-transmitter sketches define the proposed surface and semantics for later work.
+The configuration, option validation, finite text encoding, and frame-symbol
+APIs below are implemented and documented in package GoDoc. Receiver and
+transmitter sketches define the proposed public surface and semantics for later
+work. The internal receiver experiment does not implement that public API.
 
 ### Configuration
 
@@ -506,8 +523,8 @@ ESC and US do not request FIGS/LTRS and are rejected as unsupported text.
 
 The result is caller-owned. Empty input and all errors return the zero
 `EncodedText`, including nil `Codes`; errors never expose a partial encoding.
-No state is shared between calls. `EncodeText` and `TextOptions.Validate` are
-implemented; `Symbol` and `FrameCodes` remain the next protocol milestone.
+No state is shared between calls. `EncodeText`, `TextOptions.Validate`,
+`Symbol`, and `FrameCodes` are implemented.
 
 `FrameCodes` rejects values above 31 and invalid stop selections. It adds
 framing to the supplied codes without inserting shifts, lead-in, or tail.
@@ -515,6 +532,12 @@ The output is canonical and uncoalesced: exactly seven entries per code, in
 order, for start, data bits 0 through 4, and stop. Start and data entries have
 `HalfBits=2`; the stop entry has `HalfBits=3` or `4`. Adjacent identical states
 remain separate, including across characters. Empty input returns no entries.
+Invalid stop selections return `*OptionsError` with `Field="StopBits"` before
+codes are inspected, including for empty input. The first value above 31 returns
+`*InvalidCodeError` with zero-based `CodeIndex` and the rejected `Code`, unwrapping
+to `ErrInvalidInput`. Validation precedes output allocation. Errors and empty
+valid input return nil symbols; successful output is caller-owned and input is
+never modified. An unrepresentable output length also returns `ErrInvalidInput`.
 Internal rendering may combine runs without changing this public result.
 This protocol output supports analysis and a future hardware FSK adapter;
 the adapter would own wall-clock scheduling and electrical polarity.
@@ -592,7 +615,8 @@ field path, such as `Baud.Numerator` or `Squelch.OpenDB`) and `Reason`, and unwr
 to the respective sentinel. Human-readable reason/error strings are not stable
 machine-readable identifiers. `*InvalidUTF8Error` exposes `ByteOffset` and
 unwraps to `ErrInvalidInput`. `*UnsupportedTextError` exposes `Rune` and
-`ByteOffset` and unwraps to `ErrUnsupportedText`. The remaining error categories
+`ByteOffset` and unwraps to `ErrUnsupportedText`. `*InvalidCodeError` exposes
+`CodeIndex` and `Code` and unwraps to `ErrInvalidInput`. The remaining error categories
 below are planned for the operations that use them.
 
 Export sentinel errors for `ErrInvalidConfig`, `ErrInvalidOptions`,

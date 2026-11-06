@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "partition": "development",
+  "candidate": "guarded-offset-short-evidence-v1",
+  "base_parameters": "receiver-noise-aware-v1.json",
+  "evidence_window_bits": 0.5,
+  "evidence_noise_multiplier": 2,
+  "description": "Use the existing half-bit correlators for qualified peak evidence; retain long-window data decisions and guard parameters. Separate follow-up to the frozen long-window evidence results."
+}

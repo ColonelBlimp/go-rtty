@@ -4,20 +4,39 @@
 # Fixture corpus
 
 This is a small **development fixture set**, not the release reception corpus.
-There is no go-rtty receiver or transmitter yet. Passing the ordinary tests
-establishes finite text encoding, configuration contracts, and artifact
-integrity/consistency, not modem interoperability. Encoder tests consume the
-fixed text and alphabet vectors; configuration tests consume the independent
-audio manifest's explicit settings and expected tones. Neither processes PCM.
+There is an internal receiver experiment and no public receiver or transmitter
+yet. Passing the ordinary tests establishes finite text encoding, protocol
+framing, configuration contracts, clean-fixture receiver decoding and chunk
+invariance, and artifact integrity/consistency. Encoder and
+framing tests consume the fixed text, alphabet, and framing vectors;
+configuration tests consume the independent audio manifest's explicit settings
+and expected tones. The public APIs do not process PCM. Internal receiver tests
+decode all nine independent WAVs with both USOS settings; the
+[baseline report](RECEIVER_BASELINE.md) records the results and limitations.
+The [impairment study](RECEIVER_IMPAIRMENTS.md) derives controlled development
+conditions from those same files and retains reception errors separately from
+reproducibility and chunk-invariance results.
+The later [gain-step timing update](RECEIVER_GAIN_STEPS.md) removes the common
+step's observed losses and retains a separate report of the current receiver,
+with the original report unchanged for comparison.
+The [unequal-tone study](RECEIVER_SELECTIVE.md) adds symbol-conditioned
+amplitude derivatives of the same independent WAVs. These are controlled
+development perturbations, not physical selective-channel or HF evidence.
+The [guarded-envelope follow-up](RECEIVER_NOISE_AWARE.md) reuses exactly these
+inputs and prior impairments. Its short-evidence variant preserves the prior
+matrix's code/text results while improving 106 of 135 unequal-tone runs.
 
 ## Checked-in evidence
 
 | Group | Contents | Evidence |
 | --- | --- | --- |
-| Protocol | All 32 US alphabet codes in letters/figures, explicit LSB-first bits; eight literal half-bit frame examples; eight text and four unsupported-rune examples | Specified before implementation and checked against pinned source tables. Encoder tests now consume the unchanged alphabet/text expectations; framing implementation remains pending. |
-| Clean audio | Eight minimodem transmissions: 12/48 kHz × mark-high/mark-low × 1.5/2 stop bits | WAV checksums, complete raw-code and exact text captures; 17 frames each, including shifts and CR/LF. |
-| USOS probe | `A1 A`, six frames, 12 kHz, mark-high, 1.5 stops | The transmitted codes are `[31,3,27,23,4,3]`. Expected text is `A1 A` with receive USOS on and `A1 -` with it off. |
+| Protocol | All 32 US alphabet codes in letters/figures, explicit LSB-first bits; eight literal half-bit frame examples; eight text and four unsupported-rune examples | Specified before implementation and checked against pinned source tables. Encoder and framing tests consume the unchanged expectations. Framing also checks all 32 codes and every adjacent code pair with both stop selections, plus code-partition invariance. |
+| Clean audio | Eight minimodem transmissions: 12/48 kHz × mark-high/mark-low × 1.5/2 stop bits | WAV checksums, complete raw-code and exact text captures; 17 frames each, including shifts and CR/LF. Internal receiver recovers all codes/text with both USOS policies and invariant PCM partitions. |
+| USOS probe | `A1 A`, six frames, 12 kHz, mark-high, 1.5 stops | The transmitted codes are `[31,3,27,23,4,3]`. Internal receiver produces `A1 A` with receive USOS on and `A1 -` with it off, with invariant PCM partitions. |
 | Second receiver | All nine WAVs replayed in unmodified fldigi, with both USOS policies | 18 exact widget-text comparisons; full captured output and configuration hashes in `testdata/reference/fldigi-results.json`. CRLF is displayed as LF. |
+| Controlled development impairments | 24 frozen conditions, three AWGN seeds, 324 signal runs from the same nine independent WAVs; six five-second noise-only runs | `receiver-channel-v1.json` manifest and retained report pin conditions, generator source, derivative PCM hashes, clipping, raw codes, both exact text views, and edit counts. Noise, common gain-step, and dropout errors are retained. No held-out/HF or release acceptance claim. |
+| Unequal-tone threshold comparison | Eleven conditions, three candidates, 405 derived-input results, 972 prior-matrix comparisons, and 72 negative-control results | `receiver-selective-v1.json` manifest/report retain exact outcomes and source/input hashes. Envelope correction improves unequal-level audio but regresses on earlier noise/gain-step cases. Candidates remain test-only; current receiver and prior evidence are unchanged. |
+| Guarded envelope/evidence comparison | Two long-evidence candidates: 918 signal and 48 control results; separate half-bit evidence follow-up: 459 signal and 24 control results | `receiver-noise-aware-v1.json` and `receiver-noise-short-v1.json` manifests/reports retain unchanged waveform hashes, raw outputs, edit counts, guard/evidence counters, and framing failures. Short evidence reduces unequal-tone edits to 12 without per-run code/text regression on either matrix. These remain development derivatives, with no new HF labels or held-out groups. |
 | External corpus manifest | Five GRITTY originals and ten 12/48 kHz derivatives; audio and captures stored externally | Source/derived hashes, provisional tuning, conversion recipe, and development-only assignments in `testdata/manifests/gritty.json`. No trusted labels or scored reception result. |
 | W6IWI external manifest | Three HF originals and six 12/48 kHz derivatives; audio and captures stored externally | Source-described test patterns, hashes, provisional tuning, and an explicit WebSDR container exception in `testdata/manifests/w6iwi.json`. No trusted aligned transcripts or scored ranges. |
 

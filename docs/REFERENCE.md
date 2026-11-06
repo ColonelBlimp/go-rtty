@@ -5,9 +5,11 @@
 
 The foundation uses minimodem 0.24 for independent audio and raw-code capture,
 and the **unmodified fldigi 4.2.06 application** for a second receiver check.
-There is no go-rtty modem yet; the public package currently provides finite text
-encoding, configuration, and option validation. These external checks establish a reproducible reference
-workflow, not bidirectional interoperability with this library.
+The public package currently provides finite text encoding, framing,
+configuration, and option validation. An internal receiver now decodes these
+independent clean WAVs; its [baseline report](RECEIVER_BASELINE.md) separates
+those results from outstanding HF reception work. These external checks
+establish a reproducible reference workflow, not bidirectional interoperability.
 
 ## Pinned tools
 
@@ -376,12 +378,112 @@ executions and a separate 100,000-execution run with minimization limited to
 This change adds no framing, PCM processing, or streaming state, so external
 audio replay and PCM chunk-invariance checks were not performed.
 
+The final Stage 2 slice (6 November 2026) implements `Symbol` and `FrameCodes`,
+including canonical seven-entry frames and typed invalid-code errors. Tests
+consume all eight unchanged literal framing fixtures and the CSV's explicit
+wire bits. All 32 codes and all 1,024 adjacent code pairs are checked with both
+stop selections. Tests cover every invalid byte code and stop enum, validation
+precedence, first-error index/value, nil results on failure and empty input,
+input preservation, output ownership, and independent parallel calls. Every
+code boundary in a mixed stream is tested as a split, alongside single-code
+calls and seeded random partitions. These establish symbol-level partition
+invariance; they do not establish PCM chunk invariance.
+
+For the framing slice, `GOCACHE=/tmp/go-build task check` passed ordinary and
+CGO-disabled Go suites, vet, race, version checks, and the offline Python suite
+(ten tests, with optional resampler qualification skipped because
+`RTTY_SAMPLERATE` was not configured). The executable framing example passes.
+The `rtty` suite also passed with `GOARCH=386 CGO_ENABLED=0` outside the sandbox;
+the initial sandboxed 32-bit run terminated with a bad-system-call error.
+Protocol fixture files and hashes are unchanged. No external audio replay,
+resampler qualification, or PCM chunk-invariance check was performed for this
+symbol-only change, which adds no audio processing or streaming modem state.
+
+The initial Stage 3 experiment adds a Go fixed-tuning receiver under
+`internal/receiver`. All nine checked-in independent WAVs decode with exact
+raw codes and text under both USOS policies. Whole/one-sample/fixed/random PCM
+partitions preserve observations, sample positions, counters, and final state;
+a short real prefix is also checked at every sample split. Logical framing,
+reset, isolation, truncation, silence/steady-tone, and table-rendering tests pass.
+`task check` passes ordinary and CGO-disabled tests, vet, race, version, and the
+offline Python suite, with optional resampler qualification skipped. The
+[baseline report](RECEIVER_BASELINE.md) records clean-fixture delay, processing
+cost, a bounded fuzz run, reproduction commands, and the open stage 3 gates.
+No external decoders or unlabelled off-air recordings were replayed for this
+change. The new strict WAV extraction helper shares the existing artifact
+parser and keeps file parsing outside the public modem package.
+
+The next receiver experiment freezes a 24-condition development channel
+manifest and retains 324 signal runs plus six short noise-only runs. It
+perturbs the original minimodem audio without using the project transmitter.
+The [impairment report](RECEIVER_IMPAIRMENTS.md) specifies the 2500 Hz SNR
+equation, seeds, clock interpolation, gain steps, dropout, impulses, clipping,
+and exact full-file scoring. Tuning/clock cases and AWGN down to 5 dB have no
+errors on these short files; 0 dB and lower noise, the common step, and the
+dropout retain code/text errors. Whole/20 ms/127-sample partitions preserve
+all observations and state even on failures, with selected one-sample/random
+checks as well. The report does not convert reproducibility into acceptance.
+`task check` passes ordinary and CGO-disabled suites, vet, race, version, and
+the offline Python suite; its optional resampler qualification remains skipped.
+Original fixtures, receiver logic, and public APIs are unchanged by this slice.
+The W6IWI source page was rechecked on 6 November, but no aligned transcript,
+new scoring range, or held-out recording was admitted. No external decoder
+was rerun. Full noise-only hours and qualified impaired reception remain open.
+
+The [gain-step timing experiment](RECEIVER_GAIN_STEPS.md) then adds a
+conditional half-bit timing path with a broadband power-step trigger and
+impulse bound, retaining the original one-bit data integrator and all framing
+tolerances. It recovers the common-step probe's three missing raw codes and
+both exact text views. The other 323 retained signal outcomes and all six
+noise-only results remain identical. Eighty-one additional step-position
+cases recover all expected codes/text; the original detector had 13 code
+edits in five of those cases. All new inputs are development tests, not HF
+or held-out evidence. `task check` passes ordinary and CGO-disabled tests,
+vet, race, version, and the offline Python suite, with optional resampler
+qualification skipped. The original report remains unchanged and its
+input/output fields reproduce with `task receiver:impairments:legacy`; the
+current report pins current source hashes. External tools were not replayed.
+
+The [unequal-tone threshold experiment](RECEIVER_SELECTIVE.md) then evaluates
+symbol-conditioned amplitude derivatives against three test-only detectors.
+The new report pins 405 unequal-tone outcomes, 972 prior-matrix comparisons,
+and 72 negative controls. Envelope offset recovers every expected code/text
+in the new model but regresses on earlier noise and common-step cases; bounded
+normalization also regresses. Neither candidate replaces the current receiver.
+The ratio replay reproduces the prior matrix exactly. All studies retain full
+code/text edit counts, waveform/source hashes, and failed reception. Whole
+versus 127-sample invariance covers the new study, with representative
+one-sample/random/20 ms/reset checks and calibrated amplitude tests. `task check`
+passes ordinary and CGO-disabled suites, vet, race, version, and offline Python,
+with optional resampler qualification skipped. Six short benchmark cases report
+no steady-state allocations with preallocated results; their test-wrapper
+overhead is explicitly included. No physical selective-channel, external decoder,
+held-out, or scored HF check was performed for this experiment.
+
+The [noise-aware envelope follow-up](RECEIVER_NOISE_AWARE.md) then freezes
+equal-bandwidth guard estimates and qualified peak/evidence gates. The first
+report retains two long-evidence candidates (918 signal outcomes and 48
+controls). Inspection shows that long-window qualification enables correction
+too late for an isolated weak start. A separate half-bit evidence report
+retains 459 signal outcomes and 24 controls, with explicit doubled-noise
+bandwidth accounting. Its unequal-tone code/text edits are 12/12/12, compared
+with the current ratio's 1204/942/946, with no per-run regression. It preserves
+all 324 prior code arrays and both text views exactly. Remaining failures are
+retained in the two fading conditions. Guard calibration, exact balanced
+fallback, isolated weak start, reset, and chunk checks pass. `task check` passes
+ordinary and CGO-disabled tests, vet, race, version, and offline Python, with
+optional resampler qualification skipped. Six short prototype benchmark cases
+have no steady-state allocations with preallocated output. Neither new trial
+replaces the current receiver or changes earlier input/evidence files. No
+external decoder, physical selective-channel, or scored HF test was run.
+
 Still unperformed: trusted labelled HF recordings and held-out reception
-comparisons, go-rtty framing/DSP/streaming implementation and chunk invariance,
+comparisons, production public receiver lifecycle and full reception gates,
 fldigi-generated TX fixtures, go-rtty bidirectional interoperability, transmit
 spectral qualification, false-output hours, and performance/resource gates.
-The `rtty` package implements finite text encoding, configuration, and option validation;
-there is no native backend or modem implementation. Five
+The `rtty` package implements finite text encoding, protocol framing,
+configuration, and option validation. The receiver remains an internal development
+experiment; there is no native backend or transmitter implementation. Five
 GRITTY and three W6IWI originals have now been acquired in an external
 development cache;
 trusted labels, held-out recordings, and redistribution terms remain unresolved.

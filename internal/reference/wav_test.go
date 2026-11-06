@@ -61,6 +61,25 @@ func TestWAVRejectsMalformed(t *testing.T) {
 	}
 }
 
+func TestDecodeWAV(t *testing.T) {
+	b := sampleWAV()
+	binary.LittleEndian.PutUint16(b[44:], 0x8000)
+	binary.LittleEndian.PutUint16(b[46:], 0x7fff)
+	rate, pcm, err := DecodeWAV(b)
+	if err != nil || rate != 12000 || len(pcm) != 2 || pcm[0] != -32768 || pcm[1] != 32767 {
+		t.Fatalf("PCM decode: %d %v %v", rate, pcm, err)
+	}
+	b[44] = 1
+	if pcm[0] != -32768 {
+		t.Fatal("PCM aliases input bytes")
+	}
+	for n := range len(b) {
+		if rate, pcm, err := DecodeWAV(b[:n]); err == nil || pcm != nil || rate != 0 {
+			t.Fatalf("accepted malformed WAV at length %d", n)
+		}
+	}
+}
+
 func FuzzInspectWAV(f *testing.F) {
 	f.Add(sampleWAV())
 	f.Add([]byte("RIFF"))
@@ -69,6 +88,10 @@ func FuzzInspectWAV(f *testing.F) {
 		rate, samples, err := inspectWAV(b)
 		if err == nil && ((rate != 12000 && rate != 48000) || samples <= 0 || samples > len(b)/2) {
 			t.Fatalf("invalid accepted metadata: %d Hz, %d samples", rate, samples)
+		}
+		decodedRate, pcm, decodedErr := DecodeWAV(b)
+		if (err == nil) != (decodedErr == nil) || (err == nil && (decodedRate != rate || len(pcm) != samples)) {
+			t.Fatal("inspection and PCM decoding disagree")
 		}
 	})
 }
