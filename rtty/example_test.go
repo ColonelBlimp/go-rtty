@@ -64,3 +64,21 @@ func ExampleEncodeText_unsupported() {
 	}
 	// Output: unsupported U+201C at byte 3
 }
+
+func ExampleFrameCodes() {
+	symbols, err := rtty.FrameCodes([]uint8{3}, rtty.StopBitsOnePointFive)
+	if err != nil {
+		panic(err)
+	}
+	for _, symbol := range symbols {
+		fmt.Printf("mark=%v half-bits=%d\n", symbol.Mark, symbol.HalfBits)
+	}
+	// Output:
+	// mark=false half-bits=2
+	// mark=true half-bits=2
+	// mark=true half-bits=2
+	// mark=false half-bits=2
+	// mark=false half-bits=2
+	// mark=false half-bits=2
+	// mark=true half-bits=3
+}

@@ -12,7 +12,7 @@ var (
 	// ErrInvalidConfig identifies an unsupported or invalid Config.
 	ErrInvalidConfig = errors.New("rtty: invalid configuration")
 
-	// ErrInvalidOptions identifies invalid encoding or decoder options.
+	// ErrInvalidOptions identifies invalid encoding, framing, or decoder options.
 	ErrInvalidOptions = errors.New("rtty: invalid options")
 
 	// ErrInvalidInput identifies malformed input, including invalid UTF-8.
@@ -55,6 +55,23 @@ func (e *OptionsError) Error() string {
 
 // Unwrap returns ErrInvalidOptions.
 func (e *OptionsError) Unwrap() error { return ErrInvalidOptions }
+
+// InvalidCodeError locates the first value above 31 in a FrameCodes input.
+// CodeIndex is the zero-based index in the supplied code slice; Code is the
+// rejected value. Use errors.Is with ErrInvalidInput and errors.As with
+// *InvalidCodeError.
+type InvalidCodeError struct {
+	CodeIndex int
+	Code      uint8
+}
+
+// Error describes the invalid code and its index.
+func (e *InvalidCodeError) Error() string {
+	return fmt.Sprintf("%s: code %d at index %d must be at most 31", ErrInvalidInput, e.Code, e.CodeIndex)
+}
+
+// Unwrap returns ErrInvalidInput.
+func (e *InvalidCodeError) Unwrap() error { return ErrInvalidInput }
 
 // InvalidUTF8Error locates the first malformed UTF-8 encoding in the original
 // input string. ByteOffset is zero-based and is not a rune index. A correctly
