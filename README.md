@@ -31,6 +31,10 @@ The later [guarded-envelope follow-up](docs/RECEIVER_NOISE_AWARE.md) reduces
 controlled unequal-tone code errors from 1204 to 12 while preserving all 324
 prior code/text results. It remains test-only pending physical-channel, wider
 tuning, and labelled-HF validation.
+The [two-path channel study](docs/RECEIVER_TWO_PATH.md) now calibrates a causal
+frequency-selective convolution against its analytic response. It retains
+deep/noisy echo losses and rejects a faster level tracker that worsens common
+gain steps. The current receiver and prior guarded candidate are unchanged.
 
 The ordinary tests validate text encoding, framing, configuration contracts,
 the experimental receiver on clean/impaired development audio, and retained
@@ -44,6 +48,10 @@ fetches five checksum-pinned GRITTY recordings and
 [three W6IWI HF tests](docs/REFERENCE.md#external-w6iwi-development-workflow),
 prepares fixed 12/48 kHz derivatives, and supports unscored fldigi and minimodem
 captures. Audio and captures remain in a caller-selected external cache.
+The [transcript review workflow](docs/TRANSCRIPTS.md) adds original-rate review
+packets, explicit admission, matched Go/fldigi capture plans, and printable-view
+development scoring with optional known-code comparisons. It requires
+independent reviewed truth; draft labels cannot be scored.
 Trusted aligned transcripts and held-out reception validation are outstanding.
 
 The [design document](docs/RTTY_DESIGN.md) specifies the proposed architecture,
@@ -217,14 +225,18 @@ go test ./...
 CGO_ENABLED=0 go test ./...
 task check                 # version, Go/Python tests, vet, race
 task corpus:check          # offline Python tooling checks; optional resampler qualification
+task corpus:check-captures # admission and actual Go capture/scoring on known-TX test audio
 task receiver:baseline     # internal receiver results on independent clean WAVs
 task receiver:impairments  # reproducible development errors and chunk invariance
 task receiver:impairments:legacy # reproduce the original receiver comparison
 task receiver:selective    # unequal-tone candidates and existing-case regressions
 task receiver:noise        # guarded envelope estimates and half-bit evidence
+task receiver:paths        # fade traces and causal two-path comparisons
+task test:race-paths       # targeted race checks for the new channel work
 task bench:receiver        # clean receiver benchmark with 20 ms chunks
 task bench:thresholds      # test-only threshold candidates with replay overhead
 task bench:noise           # guarded-envelope prototype costs
+task bench:paths           # clean costs of the channel-study candidates
 task --list                # implemented tasks only
 task version:get
 ```

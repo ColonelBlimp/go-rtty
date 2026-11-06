@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "partition": "development",
+  "candidate": "qualified-fall-v1",
+  "base_parameters": "receiver-noise-aware-v1.json",
+  "evidence_window_bits": 0.5,
+  "qualified_fall_bits": 1,
+  "description": "Follow a falling envelope only while the corresponding half-bit branch maintains the existing qualified signal evidence. Inactive branches retain the frozen slow release; no framing tolerance changes."
+}

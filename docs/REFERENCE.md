@@ -477,6 +477,42 @@ have no steady-state allocations with preallocated output. Neither new trial
 replaces the current receiver or changes earlier input/evidence files. No
 external decoder, physical selective-channel, or scored HF test was run.
 
+The [fade/two-path study](RECEIVER_TWO_PATH.md) records rejected-stop, wrong-code,
+and no-correction failures in the frozen short-evidence detector. A one-bit
+qualified falling-level tracker reduces controlled fade edits from 12 to 8
+but adds 22 common-step code errors and is not adopted. A separate causal
+real two-path waveform model uses no bit labels and retains the complete
+delayed response. Identity/impulse and analytic tone-response calibration pass
+at both rates. The report retains 810 signal outcomes and 24 controls, including
+459 prior tracking inputs and 351 path comparisons. Guarded-short recovers
+moderate echoes but retains deep/noisy losses; qualified-fall is worse overall.
+Full ordinary and CGO-disabled Go suites, vet, targeted race checks for all new
+study/trace/streaming/calibration code, and offline Python passed. Optional
+resampler qualification was skipped. Six clean benchmark cases report zero
+steady-state allocations with preallocated output. The historical full race
+matrix was not rerun for this test-only addition. Current/previous receiver
+sources, expectations, and evidence files remain unchanged. No external tool
+or actual HF recording was replayed.
+
+The [transcript workflow](TRANSCRIPTS.md) adds original-rate draft review packets,
+independent truth/settings/boundary admission, matched clip plans, both Go
+candidates and pinned fldigi capture orchestration, and declared printable-view
+development scoring. It rejects incomplete comparisons and modified review
+subjects or derivative ranges. Actual Go admission/capture/scoring passes on
+the independently generated six-code USOS probe with both policies and zero
+text/code edits, under an explicitly synthetic temporary manifest. All nine
+independent WAVs pass capture configuration, exact code/text and whole/chunked
+observation checks for both Go candidates and policies. Full ordinary and
+CGO-disabled suites, vet, targeted capture race checks, and Python tooling with
+explicit Go integration pass (23 Python tests: 22 passed, one optional resampler
+qualification skipped). The historical full race study matrix was not rerun.
+Fldigi adapter plumbing/failure retention is mock-tested; an actual reference
+replay and resampler qualification are unperformed for this workflow because
+the pinned tools are not configured. One pinned GRITTY original was downloaded
+and verified for an external ten-second draft packet. It has no approved labels
+and yields no HF score. Exact-text and release acceptance remain false in this
+auxiliary printable-view scorer.
+
 Still unperformed: trusted labelled HF recordings and held-out reception
 comparisons, production public receiver lifecycle and full reception gates,
 fldigi-generated TX fixtures, go-rtty bidirectional interoperability, transmit

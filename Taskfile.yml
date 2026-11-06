@@ -107,6 +107,13 @@ tasks:
     cmds:
       - python3 -B -m unittest discover -s scripts -p '*_test.py'
 
+  corpus:check-captures:
+    desc: Exercise transcript admission, actual Go captures, and scoring on known-TX audio offline.
+    env:
+      RTTY_TEST_GO_CAPTURE: '1'
+    cmds:
+      - python3 -B -m unittest discover -s scripts -p 'transcripts_test.py'
+
   receiver:baseline:
     desc: Report the internal receiver's checked-in independent clean-fixture results.
     cmds:
@@ -131,6 +138,21 @@ tasks:
     desc: Reproduce guarded-envelope and short-evidence development comparisons.
     cmds:
       - go test ./internal/receiver -run '^TestNoise(AwareStudy|ShortEvidenceStudy)$' -v -count=1
+
+  receiver:paths:
+    desc: Reproduce retained fade failures, qualified tracking, and two-path channel results.
+    cmds:
+      - go test ./internal/receiver -run '^Test(PathStudy|RetainedFadeFailureTrace)$' -v -count=1
+
+  test:race-paths:
+    desc: Race-check the new fade/channel study and its streaming/calibration tests.
+    cmds:
+      - go test -race ./internal/receiver -run '^Test(Path.*|TwoPath.*|RetainedFadeFailureTrace)$'
+
+  bench:paths:
+    desc: Benchmark clean replay costs for the two-path study's detector candidates.
+    cmds:
+      - go test ./internal/receiver -run '^$' -bench '^BenchmarkPathCandidates$' -benchmem
 
   bench:noise:
     desc: Benchmark noise-aware test prototypes including shared replay overhead.

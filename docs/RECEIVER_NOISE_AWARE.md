@@ -9,6 +9,9 @@ with no per-run code/text regression on the 324 previous impairment inputs.
 It remains test-only: physical frequency-selective channels, scored HF audio,
 and the full resource/false-output gates remain unqualified. The current
 adaptive-edge ratio receiver and all previous reports are unchanged.
+The later [two-path channel study](RECEIVER_TWO_PATH.md) traces these residual
+fade errors, rejects a faster level tracker with common-step regressions, and
+measures the guarded candidate's limits on waveform convolution channels.
 
 ## Evidence and experimental sequence
 

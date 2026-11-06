@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "partition": "development",
+  "generator": "receiver-two-path-v1",
+  "signal_gain": 0.0625,
+  "snr_reference_bandwidth_hz": 2500,
+  "noise_seeds": [7, 23, 101],
+  "candidates": ["ratio", "guarded-short", "qualified-fall"],
+  "description": "Causal real two-path audio convolution of independent WAVs. No symbol labels enter the channel. Delays are integer multiples of 1/12000 seconds; complete N+D response is retained. This is a controlled physical mechanism, not a measured HF channel or held-out corpus.",
+  "cases": [
+    {"id": "identity", "delay_ticks": 0, "echo": 0},
+    {"id": "notch-high-moderate", "delay_ticks": 34, "echo": 0.5},
+    {"id": "notch-low-moderate", "delay_ticks": 38, "echo": 0.5},
+    {"id": "notch-high-deep", "delay_ticks": 34, "echo": 0.95},
+    {"id": "notch-low-deep", "delay_ticks": 38, "echo": 0.95},
+    {"id": "notch-high-fade", "delay_ticks": 34, "echo": 0.95, "fade": true},
+    {"id": "notch-low-fade", "delay_ticks": 38, "echo": 0.95, "fade": true},
+    {"id": "notch-high-noise10", "delay_ticks": 34, "echo": 0.9, "snr_db": 10},
+    {"id": "notch-low-noise10", "delay_ticks": 38, "echo": 0.9, "snr_db": 10}
+  ]
+}

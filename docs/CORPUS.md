@@ -25,6 +25,9 @@ development perturbations, not physical selective-channel or HF evidence.
 The [guarded-envelope follow-up](RECEIVER_NOISE_AWARE.md) reuses exactly these
 inputs and prior impairments. Its short-evidence variant preserves the prior
 matrix's code/text results while improving 106 of 135 unequal-tone runs.
+The [two-path study](RECEIVER_TWO_PATH.md) adds an explicitly causal delayed
+echo model independent of transmitted-bit labels, with impulse/identity and
+analytic tone-response calibration. It remains controlled development evidence.
 
 ## Checked-in evidence
 
@@ -37,6 +40,7 @@ matrix's code/text results while improving 106 of 135 unequal-tone runs.
 | Controlled development impairments | 24 frozen conditions, three AWGN seeds, 324 signal runs from the same nine independent WAVs; six five-second noise-only runs | `receiver-channel-v1.json` manifest and retained report pin conditions, generator source, derivative PCM hashes, clipping, raw codes, both exact text views, and edit counts. Noise, common gain-step, and dropout errors are retained. No held-out/HF or release acceptance claim. |
 | Unequal-tone threshold comparison | Eleven conditions, three candidates, 405 derived-input results, 972 prior-matrix comparisons, and 72 negative-control results | `receiver-selective-v1.json` manifest/report retain exact outcomes and source/input hashes. Envelope correction improves unequal-level audio but regresses on earlier noise/gain-step cases. Candidates remain test-only; current receiver and prior evidence are unchanged. |
 | Guarded envelope/evidence comparison | Two long-evidence candidates: 918 signal and 48 control results; separate half-bit evidence follow-up: 459 signal and 24 control results | `receiver-noise-aware-v1.json` and `receiver-noise-short-v1.json` manifests/reports retain unchanged waveform hashes, raw outputs, edit counts, guard/evidence counters, and framing failures. Short evidence reduces unequal-tone edits to 12 without per-run code/text regression on either matrix. These remain development derivatives, with no new HF labels or held-out groups. |
+| Fade diagnosis and two-path convolution | 459 earlier inputs for a qualified falling-level candidate; 117 two-path inputs across three candidates; 24 controls | `receiver-two-path-v1.json` and `receiver-fade-tracking-v1.json` manifests, plus the two-path report, retain 810 signal outcomes and hashes. Calibration checks tap causality and analytic tone response; moderate echo recovery and deep/noisy failures are retained. Faster tracking worsens common steps and is not adopted. |
 | External corpus manifest | Five GRITTY originals and ten 12/48 kHz derivatives; audio and captures stored externally | Source/derived hashes, provisional tuning, conversion recipe, and development-only assignments in `testdata/manifests/gritty.json`. No trusted labels or scored reception result. |
 | W6IWI external manifest | Three HF originals and six 12/48 kHz derivatives; audio and captures stored externally | Source-described test patterns, hashes, provisional tuning, and an explicit WebSDR container exception in `testdata/manifests/w6iwi.json`. No trusted aligned transcripts or scored ranges. |
 
@@ -83,6 +87,17 @@ consistency, capture contents, and vector structure. They run offline and do
 not launch external tools. `task reference:minimodem` regenerates into a
 temporary directory, requires identical WAV bytes, and compares live text and
 raw-code output to the fixed expectations. It never rewrites the corpus.
+
+The [transcript review workflow](TRANSCRIPTS.md) now supports external draft
+packets, independent review attestations, immutable admission records, and
+matched clip plans for the current receiver, guarded-short trial and pinned
+fldigi. It validates sample boundaries against the pinned whole-file derivative
+before capture and scoring. Both USOS views are required; missing/duplicate or
+failed captures cannot silently become a complete comparison. Printable-view
+CER and optional known-code edits remain development metrics, with exact-text
+and release acceptance explicitly false. Offline tests use synthetic manifests
+and independent known-transmitter audio, not fabricated HF labels. The external
+manifests remain unlabelled and no HF transcript has been admitted.
 
 ## Candidate recording sources
 

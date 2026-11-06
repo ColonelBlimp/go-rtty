@@ -48,6 +48,16 @@ guards and qualified half-bit evidence. It reduces the controlled unequal-tone
 losses to 12 code edits with no per-run code/text regression across the prior
 matrix. Physical-channel, broad tuning, and scored HF gates still precede
 adoption; the current receiver remains unchanged.
+A [two-path convolution study](RECEIVER_TWO_PATH.md) now adds calibrated,
+label-independent frequency-selective channel derivatives and traces residual
+fade errors. A qualified falling-level experiment regresses on common steps
+and is rejected; deep/noisy path reception remains unqualified.
+A [transcript review workflow](TRANSCRIPTS.md) now prepares original-rate review
+packets and gates external development comparisons on explicit independent
+labels, settings and boundaries. Matched capture plans support both Go candidates
+and pinned fldigi, with printable-view CER and optional known-code edits.
+The workflow is tested on independent synthetic TX audio; no HF labels are
+admitted, and the exact-text/held-out reception gates remain open.
 The public receiver and transmit generation remain unimplemented, and stage 3's
 labelled HF comparison remains open. The [validation record](REFERENCE.md) describes
 the checks actually run and the outstanding labelled-HF-corpus work.
